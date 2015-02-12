@@ -19,20 +19,21 @@
     <link rel="alternative" href="/atom.xml" title="Mr.Simple&#39;s Blog" type="application/atom+xml">
   
   
-    <link rel="icon" href="/favicon.png">
-  
   <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
   <link rel="stylesheet" href="/css/style.css" type="text/css">
 
   
-
 </head>
 <body>
   <div id="container">
     <div id="wrap">
       <header id="header">
-  <div id="banner"></div>
+  <div id="overlay"></div>
   <div id="header-outer" class="outer">
+    <div id="profile_img">
+      <img id="circle_img" src="holder.js/150x150" />
+    </div>
     <div id="header-title" class="inner">
       <h1 id="logo-wrap">
         <a href="/" id="logo">Mr.Simple&#39;s Blog</a>
@@ -43,24 +44,21 @@
         </h2>
       
     </div>
-    <div id="header-inner" class="inner">
+    <div id="header-menu">
       <nav id="main-nav">
-        <a id="main-nav-toggle" class="nav-icon"></a>
+        <ul>
         
-          <a class="main-nav-link" href="/">Home</a>
+          <li><a href="/"><i class="fa fa-home icon-setting"></i></a></li>
         
-          <a class="main-nav-link" href="/archives">Archives</a>
+          <li><a href="/archives"><i class="fa fa-archive icon-setting"></i></a></li>
         
+          <li><a href="/about"><i class="fa fa-user icon-setting"></i></a></li>
+        
+        
+          <li><a href="/atom.xml"><i class="fa fa-rss %> icon-setting"></i></a></li>
+        
+        </ul>
       </nav>
-      <nav id="sub-nav">
-        
-          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
-        
-        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
-      </nav>
-      <div id="search-form-wrap">
-        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" results="0" class="search-form-input" placeholder="Search"><input type="submit" value="&#xF002;" class="search-form-submit"><input type="hidden" name="q" value="site:http://yoursite.com"></form>
-      </div>
     </div>
   </div>
 </header>
@@ -124,62 +122,22 @@
   
 </section>
         
-          <aside id="sidebar">
-  
-    
-  
-    
-  
-    
-  
-    
-  <div class="widget-wrap">
-    <h3 class="widget-title">Archives</h3>
-    <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/02/">February 2015</a><span class="archive-list-count">1</span></li></ul>
-    </div>
-  </div>
-
-  
-    
-  <div class="widget-wrap">
-    <h3 class="widget-title">Recents</h3>
-    <div class="widget">
-      <ul>
-        
-          <li>
-            <a href="/2015/02/12/hello-world/">Hello World</a>
-          </li>
-        
-      </ul>
-    </div>
-  </div>
-
-  
-</aside>
-        
       </div>
       <footer id="footer">
   
   <div class="outer">
     <div id="footer-info" class="inner">
       &copy; 2015 Mr.Simple<br>
-      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+      <a href="https://github.com/ken8203/hexo-theme-alberta" target="_blank">Alberta</a> by <a href="http://jaychung.tw" target="_blank">jaychung</a>. Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>. Thank <a href="http://subtlepatterns.com/" target="_blank">Subtlepatterns</a>
     </div>
   </div>
 </footer>
     </div>
-    <nav id="mobile-nav">
-  
-    <a href="/" class="mobile-nav-link">Home</a>
-  
-    <a href="/archives" class="mobile-nav-link">Archives</a>
-  
-</nav>
+    
     
 
 <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
-
+<script src="//imsky.github.io/holder/holder.js"></script>
 
   <link rel="stylesheet" href="/fancybox/jquery.fancybox.css" type="text/css">
 
