@@ -10,9 +10,9 @@
     <meta name="author" content="Mr.Simple">
     
     <meta name="description" content="title: NineOldAnimations设计解析date: 2015-02-12 14:33:01
-tags:Android, NineOldAnimations
+tags:[Android, NineOldAnimations]
 1. 功能介绍
-   NineOldAndroids是一款支持在低版本( api 11以下 )使用Android属性动画以及3D">
+   NineOldAndroids是一款支持在低版本( api 11以下 )使用Android属性动画以及">
     
     
     
@@ -80,8 +80,8 @@ tags:Android, NineOldAnimations
       <a href="http://www.simplecoder.cn" title="Mr.Simple">Mr.Simple</a>
     </p>
   <p class="article-time">
-    <time datetime="2015-02-12T06:54:05.000Z" itemprop="datePublished">Feb 12 2015</time>
-    Updated:<time datetime="2015-02-12T06:54:04.000Z" itemprop="dateModified">Feb 12 2015</time>
+    <time datetime="2015-02-12T07:01:54.000Z" itemprop="datePublished">Feb 12 2015</time>
+    Updated:<time datetime="2015-02-12T07:01:52.000Z" itemprop="dateModified">Feb 12 2015</time>
     
   </p>
 </header>
@@ -90,11 +90,11 @@ tags:Android, NineOldAnimations
 		
 		<div id="toc" class="toc-article">
 			<strong class="toc-title">Contents</strong>
-		<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#tags:Android,_NineOldAnimations"><span class="toc-number">1.</span> <span class="toc-text">tags:Android, NineOldAnimations</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-_功能介绍"><span class="toc-number">1.1.</span> <span class="toc-text">1. 功能介绍</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-_总体设计"><span class="toc-number">1.2.</span> <span class="toc-text">2. 总体设计</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1_类详细介绍"><span class="toc-number">1.3.</span> <span class="toc-text">2.1 类详细介绍</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2_基本使用"><span class="toc-number">1.4.</span> <span class="toc-text">2.2 基本使用</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-_流程图"><span class="toc-number">1.5.</span> <span class="toc-text">3. 流程图</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#3-1_ValueAnimator流程图"><span class="toc-number">1.5.1.</span> <span class="toc-text">3.1 ValueAnimator流程图</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-2_View的ObjectAnimator流程图"><span class="toc-number">1.5.2.</span> <span class="toc-text">3.2 View的ObjectAnimator流程图</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-_详细设计"><span class="toc-number">1.6.</span> <span class="toc-text">4. 详细设计</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#4-1_核心原理分析"><span class="toc-number">1.6.1.</span> <span class="toc-text">4.1 核心原理分析</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#4-1-1_ValueAnimator-java"><span class="toc-number">1.6.1.1.</span> <span class="toc-text">4.1.1 ValueAnimator.java</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#4-1-2_ObjectAnimator-java"><span class="toc-number">1.6.1.2.</span> <span class="toc-text">4.1.2 ObjectAnimator.java</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#4-1-3_KeyFrameSet-java"><span class="toc-number">1.6.1.3.</span> <span class="toc-text">4.1.3  KeyFrameSet.java</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#4-1-4_PropertyValuesHolder-java"><span class="toc-number">1.6.1.4.</span> <span class="toc-text">4.1.4 PropertyValuesHolder.java</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-_杂谈"><span class="toc-number">1.7.</span> <span class="toc-text">5. 杂谈</span></a></li></ol></li></ol>
+		<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#tags:[Android,_NineOldAnimations]"><span class="toc-number">1.</span> <span class="toc-text">tags:[Android, NineOldAnimations]</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-_功能介绍"><span class="toc-number">1.1.</span> <span class="toc-text">1. 功能介绍</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-_总体设计"><span class="toc-number">1.2.</span> <span class="toc-text">2. 总体设计</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1_类详细介绍"><span class="toc-number">1.3.</span> <span class="toc-text">2.1 类详细介绍</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2_基本使用"><span class="toc-number">1.4.</span> <span class="toc-text">2.2 基本使用</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-_流程图"><span class="toc-number">1.5.</span> <span class="toc-text">3. 流程图</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#3-1_ValueAnimator流程图"><span class="toc-number">1.5.1.</span> <span class="toc-text">3.1 ValueAnimator流程图</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-2_View的ObjectAnimator流程图"><span class="toc-number">1.5.2.</span> <span class="toc-text">3.2 View的ObjectAnimator流程图</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-_详细设计"><span class="toc-number">1.6.</span> <span class="toc-text">4. 详细设计</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#4-1_核心原理分析"><span class="toc-number">1.6.1.</span> <span class="toc-text">4.1 核心原理分析</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#4-1-1_ValueAnimator-java"><span class="toc-number">1.6.1.1.</span> <span class="toc-text">4.1.1 ValueAnimator.java</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#4-1-2_ObjectAnimator-java"><span class="toc-number">1.6.1.2.</span> <span class="toc-text">4.1.2 ObjectAnimator.java</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#4-1-3_KeyFrameSet-java"><span class="toc-number">1.6.1.3.</span> <span class="toc-text">4.1.3  KeyFrameSet.java</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#4-1-4_PropertyValuesHolder-java"><span class="toc-number">1.6.1.4.</span> <span class="toc-text">4.1.4 PropertyValuesHolder.java</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-_杂谈"><span class="toc-number">1.7.</span> <span class="toc-text">5. 杂谈</span></a></li></ol></li></ol>
 		</div>
 		
 		<p>title: NineOldAnimations设计解析<br>date: 2015-02-12 14:33:01</p>
-<h2 id="tags:Android,_NineOldAnimations">tags:Android, NineOldAnimations</h2>
+<h2 id="tags:[Android,_NineOldAnimations]">tags:[Android, NineOldAnimations]</h2>
 <h3 id="1-_功能介绍">1. 功能介绍</h3>
 <p>   NineOldAndroids是一款支持在低版本( api 11以下 )使用Android属性动画以及3D旋转动画的框架，它提供了一系列如ViewAnimator,ObjectAnimator,ViewPropertyAnimator等API来完成这些动画,解决了Android动画框架在低版本的兼容性问题。在api 11 ( Honeycomb (Android 3.0) )后Android推出了属性动画、X轴翻转等动画效果，但是这些效果却不能运行在api 11以下,NineOldAndroids的出现使得这些动画效果能够兼容低版本系统，保证动画在各个系统版本能够完美运行。     </p>
 <p>  <img src="http://img.blog.csdn.net/20150208200001890" alt="NineOldAndroids"></p>
@@ -201,14 +201,14 @@ tags:Android, NineOldAnimations
 	
 <nav class="article-nav clearfix">
  
- <div class="prev" >
- <a href="/2015/02/12/2014年终总结/" title="2014年终总结">
-  <strong>PREVIOUS:</strong><br/>
-  <span>
-  2014年终总结</span>
+
+<div class="next">
+<a href="/2015/02/12/2014年终总结/"  title="2014年终总结">
+ <strong>NEXT:</strong><br/> 
+ <span>2014年终总结
+</span>
 </a>
 </div>
-
 
 </nav>
 
@@ -218,7 +218,7 @@ tags:Android, NineOldAnimations
 
   <div id="toc" class="toc-aside">
   <strong class="toc-title">Contents</strong>
-  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#tags:Android,_NineOldAnimations"><span class="toc-number">1.</span> <span class="toc-text">tags:Android, NineOldAnimations</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-_功能介绍"><span class="toc-number">1.1.</span> <span class="toc-text">1. 功能介绍</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-_总体设计"><span class="toc-number">1.2.</span> <span class="toc-text">2. 总体设计</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1_类详细介绍"><span class="toc-number">1.3.</span> <span class="toc-text">2.1 类详细介绍</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2_基本使用"><span class="toc-number">1.4.</span> <span class="toc-text">2.2 基本使用</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-_流程图"><span class="toc-number">1.5.</span> <span class="toc-text">3. 流程图</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#3-1_ValueAnimator流程图"><span class="toc-number">1.5.1.</span> <span class="toc-text">3.1 ValueAnimator流程图</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-2_View的ObjectAnimator流程图"><span class="toc-number">1.5.2.</span> <span class="toc-text">3.2 View的ObjectAnimator流程图</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-_详细设计"><span class="toc-number">1.6.</span> <span class="toc-text">4. 详细设计</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#4-1_核心原理分析"><span class="toc-number">1.6.1.</span> <span class="toc-text">4.1 核心原理分析</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#4-1-1_ValueAnimator-java"><span class="toc-number">1.6.1.1.</span> <span class="toc-text">4.1.1 ValueAnimator.java</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#4-1-2_ObjectAnimator-java"><span class="toc-number">1.6.1.2.</span> <span class="toc-text">4.1.2 ObjectAnimator.java</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#4-1-3_KeyFrameSet-java"><span class="toc-number">1.6.1.3.</span> <span class="toc-text">4.1.3  KeyFrameSet.java</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#4-1-4_PropertyValuesHolder-java"><span class="toc-number">1.6.1.4.</span> <span class="toc-text">4.1.4 PropertyValuesHolder.java</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-_杂谈"><span class="toc-number">1.7.</span> <span class="toc-text">5. 杂谈</span></a></li></ol></li></ol>
+  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#tags:[Android,_NineOldAnimations]"><span class="toc-number">1.</span> <span class="toc-text">tags:[Android, NineOldAnimations]</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-_功能介绍"><span class="toc-number">1.1.</span> <span class="toc-text">1. 功能介绍</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-_总体设计"><span class="toc-number">1.2.</span> <span class="toc-text">2. 总体设计</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1_类详细介绍"><span class="toc-number">1.3.</span> <span class="toc-text">2.1 类详细介绍</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2_基本使用"><span class="toc-number">1.4.</span> <span class="toc-text">2.2 基本使用</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-_流程图"><span class="toc-number">1.5.</span> <span class="toc-text">3. 流程图</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#3-1_ValueAnimator流程图"><span class="toc-number">1.5.1.</span> <span class="toc-text">3.1 ValueAnimator流程图</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-2_View的ObjectAnimator流程图"><span class="toc-number">1.5.2.</span> <span class="toc-text">3.2 View的ObjectAnimator流程图</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-_详细设计"><span class="toc-number">1.6.</span> <span class="toc-text">4. 详细设计</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#4-1_核心原理分析"><span class="toc-number">1.6.1.</span> <span class="toc-text">4.1 核心原理分析</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#4-1-1_ValueAnimator-java"><span class="toc-number">1.6.1.1.</span> <span class="toc-text">4.1.1 ValueAnimator.java</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#4-1-2_ObjectAnimator-java"><span class="toc-number">1.6.1.2.</span> <span class="toc-text">4.1.2 ObjectAnimator.java</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#4-1-3_KeyFrameSet-java"><span class="toc-number">1.6.1.3.</span> <span class="toc-text">4.1.3  KeyFrameSet.java</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#4-1-4_PropertyValuesHolder-java"><span class="toc-number">1.6.1.4.</span> <span class="toc-text">4.1.4 PropertyValuesHolder.java</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-_杂谈"><span class="toc-number">1.7.</span> <span class="toc-text">5. 杂谈</span></a></li></ol></li></ol>
   </div>
 
 <div id="asidepart">
