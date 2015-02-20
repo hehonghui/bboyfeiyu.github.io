@@ -1,0 +1,384 @@
+
+ <!DOCTYPE HTML>
+<html lang="Chinese">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>Android源码之ListView的适配器模式 | Mr.Simple&#39;s Blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
+    
+    <meta name="author" content="Mr.Simple">
+    
+    <meta name="description" content="模式的定义
+适配器模式把一个类的接口变换成客户端所期待的另一种接口，从而使原本因接口不匹配而无法在一起工作的两个类能够在一起工作。
+使用场景
+　　用电源接口做例子，笔记本电脑的电源一般都是接受5V的电压，但是我们生活中的电线电压一般都是220V的输出。这个时候就出现了不匹配的状况，在软件开发中我们称">
+    
+    
+    
+    
+    
+    <link rel="icon" href="/img/favicon.png">
+    
+    
+    <link rel="apple-touch-icon" href="/img/header.png">
+    <link rel="apple-touch-icon-precomposed" href="/img/header.png">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/header.png" alt="Mr.Simple&#39;s Blog" title="Mr.Simple&#39;s Blog"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Mr.Simple&#39;s Blog">Mr.Simple&#39;s Blog</a></h1>
+				<h2 class="blog-motto">KEEP IT SIMPLE AND STUPID!</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="http://blog.csdn.net/bboyfeiyu">CSDN Blog</a></li>
+					
+						<li><a href="https://github.com/bboyfeiyu">Github</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+					<li>
+					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="text" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:www.simplecoder.cn">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/02/20/adapter/" title="Android源码之ListView的适配器模式" itemprop="url">Android源码之ListView的适配器模式</a>
+  </h1>
+  <p class="article-author">By
+    
+      <a href="http://www.simplecoder.cn" title="Mr.Simple">Mr.Simple</a>
+    </p>
+  <p class="article-time">
+    <time datetime="2015-02-20T15:20:45.000Z" itemprop="datePublished">Feb 20 2015</time>
+    Updated:<time datetime="2015-02-20T15:25:09.000Z" itemprop="dateModified">Feb 20 2015</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">Contents</strong>
+		<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#模式的定义"><span class="toc-number">1.</span> <span class="toc-text">模式的定义</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#使用场景"><span class="toc-number">2.</span> <span class="toc-text">使用场景</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#角色介绍_"><span class="toc-number">3.</span> <span class="toc-text">角色介绍　　</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#_"><span class="toc-number">4.</span> <span class="toc-text"> </span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#类适配器模式"><span class="toc-number">4.1.</span> <span class="toc-text">类适配器模式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#对象适配器模式"><span class="toc-number">4.2.</span> <span class="toc-text">对象适配器模式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#类适配器和对象适配器的权衡"><span class="toc-number">4.3.</span> <span class="toc-text">类适配器和对象适配器的权衡</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#ListView中的Adapter模式"><span class="toc-number">5.</span> <span class="toc-text">ListView中的Adapter模式</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#适配器模式的优点"><span class="toc-number">6.</span> <span class="toc-text">适配器模式的优点</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#适配器模式的缺点"><span class="toc-number">7.</span> <span class="toc-text">适配器模式的缺点</span></a></li></ol>
+		</div>
+		
+		<h2 id="模式的定义">模式的定义</h2>
+<p>适配器模式把一个类的接口变换成客户端所期待的另一种接口，从而使原本因接口不匹配而无法在一起工作的两个类能够在一起工作。</p>
+<h2 id="使用场景">使用场景</h2>
+<p>　　用电源接口做例子，笔记本电脑的电源一般都是接受5V的电压，但是我们生活中的电线电压一般都是220V的输出。这个时候就出现了不匹配的状况，在软件开发中我们称之为接口不兼容，此时就需要适配器来进行一个接口转换。在软件开发中有一句话正好体现了这点：任何问题都可以加一个中间层来解决。这个层我们可以理解为这里的Adapter层，通过这层来进行一个接口转换就达到了兼容的目的。<br>　　<br>　　适配器模式也分两种，即类适配器模式、对象适配器模式，结构图如图1、图2。<br>　　<table><br>    <tr><br>        <td><img src="http://img.blog.csdn.net/20150220212211272"></td><br>        <td> <img src="http://img.blog.csdn.net/20150220212230909"></td><br>    </tr><br>      <tr><br>        <td>图1</td><br>        <td>图2</td><br>    </tr><br></table></p>
+<p>　　 如图所示，类适配器是通过实现Target接口以及继承Adaptee类来实现接口转换，而对象适配器模式则是通过实现Target接口和代理Adaptee的某个方法来实现。结构上略有不同。           </p>
+<h2 id="角色介绍_">角色介绍　　</h2>
+<ul>
+<li>目标(Target)角色：这就是所期待得到的接口。注意：由于这里讨论的是类适配器模式，因此目标不可以是类。</li>
+<li>源(Adapee)角色：现在需要适配的接口。</li>
+<li><p>适配器(Adaper)角色：适配器类是本模式的核心。适配器把源接口转换成目标接口。显然，这一角色不可以是接口，而必须是具体类。      </p>
+<p>在上述电源接口这个示例中，5V电压就是Target接口，220v电压就是Adaptee类，而将电压从220V转换到5V就是Adapter。</p>
+</li>
+</ul>
+<h2 id="_"> </h2>
+<p>具体示例</p>
+<h3 id="类适配器模式">类适配器模式</h3>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line"><span class="javadoc">/**</span></div><div class="line"> * Target角色</div><div class="line"> */</div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">FiveVolt</span> </span>{</div><div class="line">    <span class="keyword">public</span> <span class="keyword">int</span> <span class="title">getVolt5</span>();</div><div class="line">}</div><div class="line"></div><div class="line"><span class="javadoc">/**</span></div><div class="line"> * Adaptee角色,需要被转换的对象</div><div class="line"> */</div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Volt220</span> </span>{</div><div class="line">    <span class="keyword">public</span> <span class="keyword">int</span> <span class="title">getVolt220</span>() {</div><div class="line">        <span class="keyword">return</span> <span class="number">220</span>;</div><div class="line">    }</div><div class="line">}</div><div class="line"></div><div class="line"><span class="comment">// adapter角色</span></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ClassAdapter</span> <span class="keyword">extends</span> <span class="title">Volt220</span> <span class="keyword">implements</span> <span class="title">FiveVolt</span> </span>{</div><div class="line"></div><div class="line">    <span class="annotation">@Override</span></div><div class="line">    <span class="keyword">public</span> <span class="keyword">int</span> <span class="title">getVolt5</span>() {</div><div class="line">        <span class="keyword">return</span> <span class="number">5</span>;</div><div class="line">    }</div><div class="line"></div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>　　Target角色给出了需要的目标接口，而Adaptee类则是需要被转换的对象。Adapter则是将Volt220转换成Target的接口。对应的是Target的目标是要获取5V的输出电压，而Adaptee即正常输出电压是220V，此时我们就需要电源适配器类将220V的电压转换为5V电压，解决接口不兼容的问题。     </p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="keyword">class</span> Test {</div><div class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span>(String[] args) {</div><div class="line">        ClassAdapter adapter = <span class="keyword">new</span> ClassAdapter();</div><div class="line">        System.<span class="keyword">out</span>.println(<span class="string">"输出电压 : "</span> + adapter.getVolt5());</div><div class="line">    }</div><div class="line">}</div></pre></td></tr></table></figure>
+
+
+<p>　</p>
+<h3 id="对象适配器模式">对象适配器模式</h3>
+<p>　　与类的适配器模式一样，对象的适配器模式把被适配的类的API转换成为目标类的API，与类的适配器模式不同的是，对象的适配器模式不是使用继承关系连接到Adaptee类，而是使用代理关系连接到Adaptee类。<br>　　<br>　　从图2可以看出，Adaptee类 ( Volt220 ) 并没有getVolt5()方法，而客户端则期待这个方法。为使客户端能够使用Adaptee类，需要提供一个包装类Adapter。这个包装类包装了一个Adaptee的实例，从而此包装类能够把Adaptee的API与Target类的API衔接起来。Adapter与Adaptee是委派关系，这决定了适配器模式是对象的。</p>
+<p>示例代码如下 : </p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div></pre></td><td class="code"><pre><div class="line"><span class="javadoc">/**</span></div><div class="line"> * Target角色</div><div class="line"> */</div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">FiveVolt</span> </span>{</div><div class="line">    <span class="keyword">public</span> <span class="keyword">int</span> <span class="title">getVolt5</span>();</div><div class="line">}</div><div class="line"></div><div class="line"><span class="javadoc">/**</span></div><div class="line"> * Adaptee角色,需要被转换的对象</div><div class="line"> */</div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Volt220</span> </span>{</div><div class="line">    <span class="keyword">public</span> <span class="keyword">int</span> <span class="title">getVolt220</span>() {</div><div class="line">        <span class="keyword">return</span> <span class="number">220</span>;</div><div class="line">    }</div><div class="line">}</div><div class="line"></div><div class="line"><span class="comment">// 对象适配器模式</span></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ObjectAdapter</span> <span class="keyword">implements</span> <span class="title">FiveVolt</span> </span>{</div><div class="line"></div><div class="line">    Volt220 mVolt220;</div><div class="line"></div><div class="line">    <span class="keyword">public</span> <span class="title">ObjectAdapter</span>(Volt220 adaptee) {</div><div class="line">        mVolt220 = adaptee;</div><div class="line">    }</div><div class="line"></div><div class="line">    <span class="keyword">public</span> <span class="keyword">int</span> <span class="title">getVolt220</span>() {</div><div class="line">        <span class="keyword">return</span> mVolt220.getVolt220();</div><div class="line">    }</div><div class="line"></div><div class="line">    <span class="annotation">@Override</span></div><div class="line">    <span class="keyword">public</span> <span class="keyword">int</span> <span class="title">getVolt5</span>() {</div><div class="line">        <span class="keyword">return</span> <span class="number">5</span>;</div><div class="line">    }</div><div class="line"></div><div class="line">}</div></pre></td></tr></table></figure>
+
+
+<p>注意，这里为了节省代码，我们并没有遵循一些面向对象的基本原则。       </p>
+<p>使用示例 :    </p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="keyword">class</span> Test {</div><div class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span>(String[] args) {</div><div class="line">        ClassAdapter adapter = <span class="keyword">new</span> ClassAdapter();</div><div class="line">        System.<span class="keyword">out</span>.println(<span class="string">"输出电压 : "</span> + adapter.getVolt5());</div><div class="line">    }</div><div class="line">}</div></pre></td></tr></table></figure>
+
+
+
+<h3 id="类适配器和对象适配器的权衡">类适配器和对象适配器的权衡</h3>
+<p>　　*　　类适配器使用对象继承的方式，是静态的定义方式；而对象适配器使用对象组合的方式，是动态组合的方式。</p>
+<p>　　*　　对于类适配器，由于适配器直接继承了Adaptee，使得适配器不能和Adaptee的子类一起工作，因为继承是静态的关系，当适配器继承了Adaptee后，就不可能再去处理Adaptee的子类了。对于对象适配器，一个适配器可以把多种不同的源适配到同一个目标。换言之，同一个适配器可以把源类和它的子类都适配到目标接口。因为对象适配器采用的是对象组合的关系，只要对象类型正确，是不是子类都无所谓。</p>
+<p>　　*　  对于类适配器，适配器可以重定义Adaptee的部分行为，相当于子类覆盖父类的部分实现方法。对于对象适配器，要重定义Adaptee的行为比较困难，这种情况下，需要定义Adaptee的子类来实现重定义，然后让适配器组合子类。虽然重定义Adaptee的行为比较困难，但是想要增加一些新的行为则方便的很，而且新增加的行为可同时适用于所有的源。</p>
+<p>　　*　　对于类适配器，仅仅引入了一个对象，并不需要额外的引用来间接得到Adaptee。对于对象适配器，需要额外的引用来间接得到Adaptee。</p>
+<p>　　建议尽量使用对象适配器的实现方式，多用合成/聚合、少用继承。当然，具体问题具体分析，根据需要来选用实现方式，最适合的才是最好的。
+　　</p>
+<h2 id="ListView中的Adapter模式">ListView中的Adapter模式</h2>
+<p>在开发过程中,ListView的Adapter是我们最为常见的类型之一。一般的用法大致如下: </p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 代码省略</span></div><div class="line"> ListView myListView = (ListView)findViewById(listview_id);</div><div class="line"> <span class="comment">// 设置适配器</span></div><div class="line"> myListView.setAdapter(<span class="keyword">new</span> MyAdapter(context, myDatas));</div><div class="line"></div><div class="line"><span class="comment">// 适配器</span></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyAdapter</span> <span class="keyword">extends</span> <span class="title">BaseAdapter</span></span>{</div><div class="line"> </div><div class="line">        <span class="keyword">private</span> LayoutInflater mInflater;</div><div class="line">        List&lt;String&gt; mDatas ; </div><div class="line">         </div><div class="line">        <span class="keyword">public</span> <span class="title">MyAdapter</span>(Context context, List&lt;String&gt; datas){</div><div class="line">            <span class="keyword">this</span>.mInflater = LayoutInflater.from(context);</div><div class="line">            mDatas = datas ;</div><div class="line">        }</div><div class="line">        <span class="annotation">@Override</span></div><div class="line">        <span class="keyword">public</span> <span class="keyword">int</span> <span class="title">getCount</span>() {</div><div class="line">            <span class="keyword">return</span> mDatas.size();</div><div class="line">        }</div><div class="line"> </div><div class="line">        <span class="annotation">@Override</span></div><div class="line">        <span class="keyword">public</span> String <span class="title">getItem</span>(<span class="keyword">int</span> pos) {</div><div class="line">            <span class="keyword">return</span> mDatas.get(pos);</div><div class="line">        }</div><div class="line"> </div><div class="line">        <span class="annotation">@Override</span></div><div class="line">        <span class="keyword">public</span> <span class="keyword">long</span> <span class="title">getItemId</span>(<span class="keyword">int</span> pos) {</div><div class="line">            <span class="keyword">return</span> pos;</div><div class="line">        }</div><div class="line"> </div><div class="line"> 		<span class="comment">// 解析、设置、缓存convertView以及相关内容</span></div><div class="line">        <span class="annotation">@Override</span></div><div class="line">        <span class="keyword">public</span> View <span class="title">getView</span>(<span class="keyword">int</span> position, View convertView, ViewGroup parent) { </div><div class="line">            ViewHolder holder = <span class="keyword">null</span>;</div><div class="line">            <span class="comment">// Item View的复用</span></div><div class="line">            <span class="keyword">if</span> (convertView == <span class="keyword">null</span>) {</div><div class="line">                holder = <span class="keyword">new</span> ViewHolder();  </div><div class="line">                convertView = mInflater.inflate(R.layout.my_listview_item, <span class="keyword">null</span>);</div><div class="line">              	<span class="comment">// 获取title</span></div><div class="line">                holder.title = (TextView)convertView.findViewById(R.id.title);</div><div class="line">                convertView.setTag(holder);</div><div class="line">            } <span class="keyword">else</span> {</div><div class="line">                holder = (ViewHolder)convertView.getTag();</div><div class="line">            }</div><div class="line">            holder.title.setText(mDatas.get(position));</div><div class="line">            <span class="keyword">return</span> convertView;</div><div class="line">        }</div><div class="line">         </div><div class="line">    }</div></pre></td></tr></table></figure>
+
+<p>这看起来似乎还挺麻烦的，看到这里我们不禁要问，ListView为什么要使用Adapter模式呢？<br>我们知道，作为最重要的View，ListView需要能够显示各式各样的视图，每个人需要的显示效果各不相同，显示的数据类型、数量等也千变万化。那么如何隔离这种变化尤为重要。     </p>
+<p>Android的做法是增加一个Adapter层来应对变化，将ListView需要的接口抽象到Adapter对象中，这样只要用户实现了Adapter的接口，ListView就可以按照用户设定的显示效果、数量、数据来显示特定的Item View。<br>通过代理数据集来告知ListView数据的个数( getCount函数 )以及每个数据的类型( getItem函数 )，最重要的是要解决Item View的输出。Item View千变万化，但终究它都是View类型，Adapter统一将Item View输出为View ( getView函数 )，这样就很好的应对了Item View的可变性。     </p>
+<p>那么ListView是如何通过Adapter模式 ( 不止Adapter模式 )来运作的呢 ？我们一起来看一看。<br>ListView继承自AbsListView，Adapter定义在AbsListView中，我们看一看这个类。     </p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">AbsListView</span> <span class="keyword">extends</span> <span class="title">AdapterView</span>&lt;<span class="title">ListAdapter</span>&gt; <span class="keyword">implements</span> <span class="title">TextWatcher</span>,</span></div><div class="line">        <span class="title">ViewTreeObserver</span>.<span class="title">OnGlobalLayoutListener</span>, <span class="title">Filter</span>.<span class="title">FilterListener</span>,</div><div class="line">        <span class="title">ViewTreeObserver</span>.<span class="title">OnTouchModeChangeListener</span>,</div><div class="line">        <span class="title">RemoteViewsAdapter</span>.<span class="title">RemoteAdapterConnectionCallback</span> {</div><div class="line"></div><div class="line">    ListAdapter mAdapter ;</div><div class="line">        </div><div class="line">    <span class="comment">// 关联到Window时调用的函数</span></div><div class="line">    <span class="annotation">@Override</span></div><div class="line">    <span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onAttachedToWindow</span>() {</div><div class="line">        <span class="keyword">super</span>.onAttachedToWindow();</div><div class="line">        <span class="comment">// 代码省略</span></div><div class="line">		<span class="comment">// 给适配器注册一个观察者,该模式下一篇介绍。</span></div><div class="line">        <span class="keyword">if</span> (mAdapter != <span class="keyword">null</span> && mDataSetObserver == <span class="keyword">null</span>) {</div><div class="line">            mDataSetObserver = <span class="keyword">new</span> AdapterDataSetObserver();</div><div class="line">            mAdapter.registerDataSetObserver(mDataSetObserver);</div><div class="line"></div><div class="line">            <span class="comment">// Data may have changed while we were detached. Refresh.</span></div><div class="line">            mDataChanged = <span class="keyword">true</span>;</div><div class="line">            mOldItemCount = mItemCount</div><div class="line">            <span class="comment">// 获取Item的数量,调用的是mAdapter的getCount方法</span></div><div class="line">            mItemCount = mAdapter.getCount();</div><div class="line">        }</div><div class="line">        mIsAttached = <span class="keyword">true</span>;</div><div class="line">    }</div><div class="line"></div><div class="line">  <span class="javadoc">/**</span></div><div class="line">     * 子类需要覆写layoutChildren()函数来布局child view,也就是Item View</div><div class="line">     */</div><div class="line">    <span class="annotation">@Override</span></div><div class="line">    <span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onLayout</span>(<span class="keyword">boolean</span> changed, <span class="keyword">int</span> l, <span class="keyword">int</span> t, <span class="keyword">int</span> r, <span class="keyword">int</span> b) {</div><div class="line">        <span class="keyword">super</span>.onLayout(changed, l, t, r, b);</div><div class="line">        mInLayout = <span class="keyword">true</span>;</div><div class="line">        <span class="keyword">if</span> (changed) {</div><div class="line">            <span class="keyword">int</span> childCount = getChildCount();</div><div class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; childCount; i++) {</div><div class="line">                getChildAt(i).forceLayout();</div><div class="line">            }</div><div class="line">            mRecycler.markChildrenDirty();</div><div class="line">        }</div><div class="line">        </div><div class="line">        <span class="keyword">if</span> (mFastScroller != <span class="keyword">null</span> && mItemCount != mOldItemCount) {</div><div class="line">            mFastScroller.onItemCountChanged(mOldItemCount, mItemCount);</div><div class="line">        }</div><div class="line">		<span class="comment">// 布局Child View</span></div><div class="line">        layoutChildren();</div><div class="line">        mInLayout = <span class="keyword">false</span>;</div><div class="line"></div><div class="line">        mOverscrollMax = (b - t) / OVERSCROLL_LIMIT_DIVISOR;</div><div class="line">    }</div><div class="line"></div><div class="line">	<span class="comment">// 获取一个Item View</span></div><div class="line">	View obtainView(<span class="keyword">int</span> position, <span class="keyword">boolean</span>[] isScrap) {</div><div class="line">        isScrap[<span class="number">0</span>] = <span class="keyword">false</span>;</div><div class="line">        View scrapView;</div><div class="line">		<span class="comment">// 从缓存的Item View中获取,ListView的复用机制就在这里</span></div><div class="line">        scrapView = mRecycler.getScrapView(position);</div><div class="line"></div><div class="line">        View child;</div><div class="line">        <span class="keyword">if</span> (scrapView != <span class="keyword">null</span>) {</div><div class="line">            <span class="comment">// 代码省略</span></div><div class="line">            child = mAdapter.getView(position, scrapView, <span class="keyword">this</span>);</div><div class="line">            <span class="comment">// 代码省略</span></div><div class="line">        } <span class="keyword">else</span> {</div><div class="line">            child = mAdapter.getView(position, <span class="keyword">null</span>, <span class="keyword">this</span>);</div><div class="line">            <span class="comment">// 代码省略</span></div><div class="line">        }</div><div class="line"></div><div class="line">        <span class="keyword">return</span> child;</div><div class="line">    }</div><div class="line">    }</div></pre></td></tr></table></figure>
+
+
+<p>AbsListView定义了集合视图的框架，比如Adapter模式的应用、复用Item View的逻辑、布局Item View的逻辑等。子类只需要覆写特定的方法即可实现集合视图的功能，例如ListView。</p>
+<p>ListView中的相关方法。    </p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div></pre></td><td class="code"><pre><div class="line">  <span class="annotation">@Override</span></div><div class="line">  <span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">layoutChildren</span>() {</div><div class="line">      <span class="comment">// 代码省略</span></div><div class="line"></div><div class="line">      <span class="keyword">try</span> {</div><div class="line">          <span class="keyword">super</span>.layoutChildren();</div><div class="line">          invalidate();</div><div class="line">	<span class="comment">// 代码省略</span></div><div class="line">	<span class="comment">// 根据布局模式来布局Item View</span></div><div class="line">          <span class="keyword">switch</span> (mLayoutMode) {</div><div class="line">          <span class="keyword">case</span> LAYOUT_SET_SELECTION:</div><div class="line">              <span class="keyword">if</span> (newSel != <span class="keyword">null</span>) {</div><div class="line">                  sel = fillFromSelection(newSel.getTop(), childrenTop, childrenBottom);</div><div class="line">              } <span class="keyword">else</span> {</div><div class="line">                  sel = fillFromMiddle(childrenTop, childrenBottom);</div><div class="line">              }</div><div class="line">              <span class="keyword">break</span>;</div><div class="line">          <span class="keyword">case</span> LAYOUT_SYNC:</div><div class="line">              sel = fillSpecific(mSyncPosition, mSpecificTop);</div><div class="line">              <span class="keyword">break</span>;</div><div class="line">          <span class="keyword">case</span> LAYOUT_FORCE_BOTTOM:</div><div class="line">              sel = fillUp(mItemCount - <span class="number">1</span>, childrenBottom);</div><div class="line">              adjustViewsUpOrDown();</div><div class="line">              <span class="keyword">break</span>;</div><div class="line">          <span class="keyword">case</span> LAYOUT_FORCE_TOP:</div><div class="line">              mFirstPosition = <span class="number">0</span>;</div><div class="line">              sel = fillFromTop(childrenTop);</div><div class="line">              adjustViewsUpOrDown();</div><div class="line">              <span class="keyword">break</span>;</div><div class="line">          <span class="keyword">case</span> LAYOUT_SPECIFIC:</div><div class="line">              sel = fillSpecific(reconcileSelectedPosition(), mSpecificTop);</div><div class="line">              <span class="keyword">break</span>;</div><div class="line">          <span class="keyword">case</span> LAYOUT_MOVE_SELECTION:</div><div class="line">              sel = moveSelection(oldSel, newSel, delta, childrenTop, childrenBottom);</div><div class="line">              <span class="keyword">break</span>;</div><div class="line">          <span class="keyword">default</span>:</div><div class="line">              <span class="comment">// 代码省略</span></div><div class="line">              <span class="keyword">break</span>;</div><div class="line">          }</div><div class="line">      </div><div class="line">  }</div><div class="line">  </div><div class="line">  <span class="comment">// 从上到下填充Item View  [ 只是其中一种填充方式 ]</span></div><div class="line">  <span class="keyword">private</span> View <span class="title">fillDown</span>(<span class="keyword">int</span> pos, <span class="keyword">int</span> nextTop) {</div><div class="line">      View selectedView = <span class="keyword">null</span>;</div><div class="line"></div><div class="line">      <span class="keyword">int</span> end = (mBottom - mTop);</div><div class="line">      <span class="keyword">if</span> ((mGroupFlags & CLIP_TO_PADDING_MASK) == CLIP_TO_PADDING_MASK) {</div><div class="line">          end -= mListPadding.bottom;</div><div class="line">      }</div><div class="line"></div><div class="line">      <span class="keyword">while</span> (nextTop &lt; end && pos &lt; mItemCount) {</div><div class="line">          <span class="comment">// is this the selected item?</span></div><div class="line">          <span class="keyword">boolean</span> selected = pos == mSelectedPosition;</div><div class="line">          View child = makeAndAddView(pos, nextTop, <span class="keyword">true</span>, mListPadding.left, selected);</div><div class="line"></div><div class="line">          nextTop = child.getBottom() + mDividerHeight;</div><div class="line">          <span class="keyword">if</span> (selected) {</div><div class="line">              selectedView = child;</div><div class="line">          }</div><div class="line">          pos++;</div><div class="line">      }</div><div class="line"></div><div class="line">      <span class="keyword">return</span> selectedView;</div><div class="line">  }</div><div class="line">  </div><div class="line">  <span class="comment">// 添加Item View</span></div><div class="line">  <span class="keyword">private</span> View <span class="title">makeAndAddView</span>(<span class="keyword">int</span> position, <span class="keyword">int</span> y, <span class="keyword">boolean</span> flow, <span class="keyword">int</span> childrenLeft,</div><div class="line">          <span class="keyword">boolean</span> selected) {</div><div class="line">      View child;</div><div class="line"></div><div class="line"><span class="comment">// 代码省略 </span></div><div class="line">      <span class="comment">// Make a new view for this position, or convert an unused view if possible</span></div><div class="line">      child = obtainView(position, mIsScrap);</div><div class="line"></div><div class="line">      <span class="comment">// This needs to be positioned and measured</span></div><div class="line">      setupChild(child, position, y, flow, childrenLeft, selected, mIsScrap[<span class="number">0</span>]);</div><div class="line"></div><div class="line">      <span class="keyword">return</span> child;</div><div class="line">  }</div></pre></td></tr></table></figure>
+
+
+<p>ListView覆写了AbsListView中的layoutChilden函数，在该函数中根据布局模式来布局Item View。Item View的个数、样式都通过Adapter对应的方法来获取，获取个数、Item View之后，将这些Item View布局到ListView对应的坐标上，再加上Item View的复用机制，整个ListView就基本运转起来了。     </p>
+<p>当然这里的Adapter并不是经典的适配器模式，但是却是对象适配器模式的优秀示例，也很好的体现了面向对象的一些基本原则。这里的Target角色和Adapter角色融合在一起，Adapter中的方法就是目标方法；而Adaptee角色就是ListView的数据集与Item View，Adapter代理数据集，从而获取到数据集的个数、元素。     </p>
+<p>通过增加Adapter一层来将Item View的操作抽象起来，ListView等集合视图通过Adapter对象获得Item的个数、数据元素、Item View等，从而达到适配各种数据、各种Item视图的效果。因为Item View和数据类型千变万化，Android的架构师们将这些变化的部分交给用户来处理，通过getCount、getItem、getView等几个方法抽象出来，也就是将Item View的构造过程交给用户来处理，灵活地运用了适配器模式，达到了无限适配、拥抱变化的目的。       </p>
+<h2 id="适配器模式的优点">适配器模式的优点</h2>
+<p>*　更好的复用性<br>　　系统需要使用现有的类，而此类的接口不符合系统的需要。那么通过适配器模式就可以让这些功能得到更好的复用。</p>
+<p>*　更好的扩展性<br>　　在实现适配器功能的时候，可以调用自己开发的功能，从而自然地扩展系统的功能。</p>
+<h2 id="适配器模式的缺点">适配器模式的缺点</h2>
+<p>　　过多的使用适配器，会让系统非常零乱，不易整体进行把握。比如，明明看到调用的是A接口，其实内部被适配成了B接口的实现，一个系统如果太多出现这种情况，无异于一场灾难。因此如果不是很有必要，可以不使用适配器，而是直接对系统进行重构。</p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/设计模式，Android/">设计模式，Android</a>
+  </div>
+
+
+
+
+<div class="article-share" id="share">
+
+  
+<div class="jiathis_style">
+    <span class="jiathis_txt">分享到：</span>
+    <a class="jiathis_button_tsina">新浪微博</a>
+    <a class="jiathis_button_weixin">微信</a>
+    <a class="jiathis_button_twitter">Twitter</a>
+    <a class="jiathis_button_evernote">EverNote</a>
+    <a href="http://www.jiathis.com/share?uid=1501277" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank">更多</a>
+</div>
+<script type="text/javascript" >
+    var jiathis_config={
+    data_track_clickback:true,
+    sm:"copy,renren,cqq",
+    pic:"",
+    summary:"",
+    
+  </script> 
+<script type="text/javascript" src="//v3.jiathis.com/code/jia.js?uid=
+" charset="utf-8"></script>      
+
+
+</div>
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+
+<div class="next">
+<a href="/2015/02/20/oop-principle/"  title="公共技术点之面向对象六大原则">
+ <strong>NEXT:</strong><br/> 
+ <span>公共技术点之面向对象六大原则
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+<section class="comment">
+	<div class="ds-thread"></div>
+</section>
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">Contents</strong>
+  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#模式的定义"><span class="toc-number">1.</span> <span class="toc-text">模式的定义</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#使用场景"><span class="toc-number">2.</span> <span class="toc-text">使用场景</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#角色介绍_"><span class="toc-number">3.</span> <span class="toc-text">角色介绍　　</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#_"><span class="toc-number">4.</span> <span class="toc-text"> </span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#类适配器模式"><span class="toc-number">4.1.</span> <span class="toc-text">类适配器模式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#对象适配器模式"><span class="toc-number">4.2.</span> <span class="toc-text">对象适配器模式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#类适配器和对象适配器的权衡"><span class="toc-number">4.3.</span> <span class="toc-text">类适配器和对象适配器的权衡</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#ListView中的Adapter模式"><span class="toc-number">5.</span> <span class="toc-text">ListView中的Adapter模式</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#适配器模式的优点"><span class="toc-number">6.</span> <span class="toc-text">适配器模式的优点</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#适配器模式的缺点"><span class="toc-number">7.</span> <span class="toc-text">适配器模式的缺点</span></a></li></ol>
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<aside class="clearfix">
+
+  
+
+  
+<div class="tagslist">
+	<p class="asidetitle">Tags</p>
+		<ul class="clearfix">
+		
+			<li><a href="/tags/android/" title="android">android<sup>1</sup></a></li>
+		
+			<li><a href="/tags/设计模式，Android/" title="设计模式，Android">设计模式，Android<sup>1</sup></a></li>
+		
+			<li><a href="/tags/面向对象/" title="面向对象">面向对象<sup>1</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  <div class="rsspart">
+	<a href="null" target="_blank" title="rss">RSS</a>
+</div>
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<div class="social-font clearfix">
+		
+		
+		
+		
+		
+	</div>
+		<p class="copyright">Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/A-limon/pacman" target="_blank" title="Pacman">Pacman</a> © 2015 
+		
+		<a href="http://www.simplecoder.cn" target="_blank" title="Mr.Simple">Mr.Simple</a>
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.1.0.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+
+<script type="text/javascript">
+  var duoshuoQuery = {short_name:"null"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script> 
+
+
+
+
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+ga('create', 'null', 'null');  
+ga('send', 'pageview');
+</script>
+
+
+  </body>
+</html>
