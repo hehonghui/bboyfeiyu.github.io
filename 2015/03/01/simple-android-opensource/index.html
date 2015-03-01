@@ -1,0 +1,337 @@
+
+ <!DOCTYPE HTML>
+<html lang="Chinese">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>Mr.Simple&#39;s Blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
+    
+    <meta name="author" content="Mr.Simple">
+    
+    <meta name="description" content="title: simple-android-opensourcedate: 2015-03-01 13:07:18
+tags:android,开源
+ Android开源库与设计模式开源组织建立
+
+简介
+在2014年年底突然参与了CSDN的博客之星评选，看着自己的博客水平实在太低，于是就想一定得写一些">
+    
+    
+    
+    
+    
+    <link rel="icon" href="/img/favicon.png">
+    
+    
+    <link rel="apple-touch-icon" href="/img/header.png">
+    <link rel="apple-touch-icon-precomposed" href="/img/header.png">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/header.png" alt="Mr.Simple&#39;s Blog" title="Mr.Simple&#39;s Blog"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Mr.Simple&#39;s Blog">Mr.Simple&#39;s Blog</a></h1>
+				<h2 class="blog-motto">KEEP IT SIMPLE AND STUPID!</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="http://blog.csdn.net/bboyfeiyu">CSDN Blog</a></li>
+					
+						<li><a href="https://github.com/bboyfeiyu">Github</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+					<li>
+					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="text" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:www.simplecoder.cn">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/03/01/simple-android-opensource/" title="" itemprop="url"></a>
+  </h1>
+  <p class="article-author">By
+    
+      <a href="http://www.simplecoder.cn" title="Mr.Simple">Mr.Simple</a>
+    </p>
+  <p class="article-time">
+    <time datetime="2015-03-01T05:08:23.000Z" itemprop="datePublished">Mar 1 2015</time>
+    Updated:<time datetime="2015-03-01T05:08:22.000Z" itemprop="dateModified">Mar 1 2015</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">Contents</strong>
+		<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#tags:android,开源"><span class="toc-number">1.</span> <span class="toc-text">tags:android,开源</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#_Android开源库与设计模式开源组织建立"><span class="toc-number"></span> <span class="toc-text"> Android开源库与设计模式开源组织建立</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#简介"><span class="toc-number">1.</span> <span class="toc-text">简介</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Android知名开源库简版实现开源项目"><span class="toc-number">2.</span> <span class="toc-text">Android知名开源库简版实现开源项目</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Android源码设计模式分析开源项目"><span class="toc-number">3.</span> <span class="toc-text">Android源码设计模式分析开源项目</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#开始之前"><span class="toc-number">4.</span> <span class="toc-text">开始之前</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Github地址与QQ交流群"><span class="toc-number">5.</span> <span class="toc-text">Github地址与QQ交流群</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#加群之后"><span class="toc-number">6.</span> <span class="toc-text">加群之后</span></a></li></ol>
+		</div>
+		
+		<p>title: simple-android-opensource<br>date: 2015-03-01 13:07:18</p>
+<h2 id="tags:android,开源">tags:android,开源</h2>
+<h1 id="_Android开源库与设计模式开源组织建立"><img src="http://img.blog.csdn.net/20150301124409249"> Android开源库与设计模式开源组织建立</h1>
+<hr>
+<h2 id="简介">简介</h2>
+<p>在2014年年底突然参与了CSDN的博客之星评选，看着自己的博客水平实在太低，于是就想一定得写一些跟别人不太一样的博客出来。经过自己的一番思考，觉得在Android开源库的深入实现上并没有什么太多的资料，或者只是大概讲述了一些基本原理。这样我觉得是不够的，很多事情你没有自己去经历你不会有很深的认识，或者你根本不知道原来它会出现这样的问题。于是我就想我没通过学习轮子制造过程来更加深入的学习,这样不仅能够了解那些知名的开源库，也能够从实战的角度学习开源库的实现。如果你不去制造很可能只是停留在事物的表面,有些东西你想应该是这样的,但是很可能并非如此;有些东西你没有去经历,你不会知道原来它会出现这样的问题。     </p>
+<p>于是，在2014年年底，我相继推出了<a href="http://blog.csdn.net/column/details/simple-net.html" target="_blank" rel="external">教你写Android网络框架</a>、<a href="http://blog.csdn.net/column/details/android-imageloader.html" target="_blank" rel="external">教你写Android ImageLoader框架</a>，得到的反应还都不错。再加上我本身对于架构和设计比较感兴趣，所以一直在不断地完善<a href="http://blog.csdn.net/column/details/android-dp.html" target="_blank" rel="external">Android源码分析之设计模式</a>这个系列，希望通过分析Android系统中的设计模式来提升大家对设计模式的理解，从源码的角度来剖析既增加了对Android系统本身的了解，也从优秀的设计中领悟模式的实际运用以及它适用的场景，以此来提升初、中级工程师的设计水平。在此过程中推出了自己的第一个开源库<a href="https://github.com/bboyfeiyu/AndroidEventBus" target="_blank" rel="external">AndroidEventBus</a>，并且参与了<a href="https://github.com/Trinea" target="_blank" rel="external">Trinea</a>的一些项目，于是对于开源有了更大的热情。        </p>
+<p>我想一个有情怀的人都不会是只顾自己，他应该在通过互联网学习到所需知识之后将自己的所思所得分享给同样需要的人，使得后来者不必经历他学习这些知识时所经历的痛苦、折腾，让别人少走弯路。尽管自己的领悟不一定正确，但是分享出来也可以让别人从另一个角度看到这件事本身。因此，我建立了这个开源组织，通过我们这些人的分享希望能够帮助到一些需要的朋友。另外，我不是什么大神，我们都还在不断地学习中，如果你认为我们的东西有什么不对、不合适的地方，欢迎指正，并且希望你加入到我们当中，就当为我们所热爱的行业做出一点贡献吧。                 </p>
+<h2 id="Android知名开源库简版实现开源项目">Android知名开源库简版实现开源项目</h2>
+<p><a href="https://github.com/simple-android-framework-exchange/simple-android-opensource-framework" target="_blank" rel="external">Android知名开源库简版实现开源项目</a>通过分析并实现Android平台知名开源框架的简单版本深入了解开源库核心技术，并对这些库的设计思想有一定的了解。稳定、强大的开源库一般都较为复杂，比如Universal-ImageLoader，因此简版开源库不需要完全按照原版来实现，只需要把核心架构、原理实现，并且做到可运用到实际项目中即可。在实现开源库简版的同时，作者需要写一系列文章来剖析它的实现原理以及为什么要这么设计，在提升自我的同时将框架的设计与实现、领悟分享给他人。</p>
+<h2 id="Android源码设计模式分析开源项目">Android源码设计模式分析开源项目</h2>
+<p><a href="https://github.com/simple-android-framework-exchange/android_design_patterns_analysis" target="_blank" rel="external">Android源码设计模式分析开源项目</a>通过分析Android系统中的设计模式来加深大家对设计模式的理解，从源码的角度来剖析既增加了对Android系统本身的了解，也从优秀的设计中领悟模式的实际运用以及它适用的场景，避免在实际开发中的生搬硬套，提高开发人员的设计能力。</p>
+<h2 id="开始之前">开始之前</h2>
+<p>Android平台有很多优秀的开源库，如果你对这些还不是很了解，可以参考Trinea的<a href="https://github.com/Trinea/android-open-project" target="_blank" rel="external">android-open-project</a>列举的知名开源库。对一些知名开源库的分析请参考Trinea的<a href="https://github.com/android-cn/android-open-project-analysis" target="_blank" rel="external">android-open-project-analysis</a>。      </p>
+<p>我想在你了解了一些开源库，并且学习了Trinea的对开源库分析的文章之后对于开源库的核心技术就有了一定的了解。此时你可以利用这些基础来重复造这些轮子，这些轮子不必很完善、稳定，只需要展示它的核心原理、设计，并且可用即可。这样从实战中学习这些开源库，不仅能够提升技术，也能够学习这些开源库的优秀设计。     </p>
+<p>如果你对面向对象不是很了解，那么在开始之前先学习一下<a href="https://github.com/simple-android-framework-exchange/android_design_patterns_analysis/oop-principles/oop-principles.md" target="_blank" rel="external">面向对象的六大原则</a>是非常有必要的。   </p>
+<h2 id="Github地址与QQ交流群">Github地址与QQ交流群</h2>
+<p><a href="https://github.com/simple-android-framework-exchange" target="_blank" rel="external">Android开源库与设计模式开源组织</a>，这是一个开发版的组织，正式版会发布在<a href="https://github.com/simple-android-framework" target="_blank" rel="external">simple-android-opensource-framework</a>。其中有两个项目，分别为<a href="https://github.com/simple-android-framework-exchange/simple-android-opensource-framework" target="_blank" rel="external">Android知名开源库简版实现开源项目</a>、<a href="https://github.com/simple-android-framework-exchange/android_design_patterns_analysis" target="_blank" rel="external">Android源码设计模式分析开源项目</a>。     </p>
+<p><strong><font color="red">QQ交流群: 413864859，欢迎大家积极参与进来，提升自我，分享知识与技术。</font></strong>       </p>
+<h2 id="加群之后">加群之后</h2>
+<p>加了QQ群之后，有兴趣参与开源项目的可以把github账户名发给我，我邀请大家加入组织，然后你在<a href="https://github.com/simple-android-framework-exchange" target="_blank" rel="external">simple-android-framework-exchange</a>接受我的邀请。然后你们可以在相应的仓库中填写任务表，把自己想实现的开源库或者想分析的模式填写到任务表，然后在规定的时间内完成(包括代码、核心原理分析、demo等)。我们在每期的时间点内将合格的作品发布到正式版的仓库中。           </p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+
+
+
+
+<div class="article-share" id="share">
+
+  
+<div class="jiathis_style">
+    <span class="jiathis_txt">分享到：</span>
+    <a class="jiathis_button_tsina">新浪微博</a>
+    <a class="jiathis_button_weixin">微信</a>
+    <a class="jiathis_button_twitter">Twitter</a>
+    <a class="jiathis_button_evernote">EverNote</a>
+    <a href="http://www.jiathis.com/share?uid=1501277" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank">更多</a>
+</div>
+<script type="text/javascript" >
+    var jiathis_config={
+    data_track_clickback:true,
+    sm:"copy,renren,cqq",
+    pic:"",
+    summary:"",
+    
+  </script> 
+<script type="text/javascript" src="//v3.jiathis.com/code/jia.js?uid=
+" charset="utf-8"></script>      
+
+
+</div>
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+
+<div class="next">
+<a href="/2015/02/20/adapter/"  title="Android源码之ListView的适配器模式">
+ <strong>NEXT:</strong><br/> 
+ <span>Android源码之ListView的适配器模式
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+<section class="comment">
+	<div class="ds-thread"></div>
+</section>
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">Contents</strong>
+  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#tags:android,开源"><span class="toc-number">1.</span> <span class="toc-text">tags:android,开源</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#_Android开源库与设计模式开源组织建立"><span class="toc-number"></span> <span class="toc-text"> Android开源库与设计模式开源组织建立</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#简介"><span class="toc-number">1.</span> <span class="toc-text">简介</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Android知名开源库简版实现开源项目"><span class="toc-number">2.</span> <span class="toc-text">Android知名开源库简版实现开源项目</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Android源码设计模式分析开源项目"><span class="toc-number">3.</span> <span class="toc-text">Android源码设计模式分析开源项目</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#开始之前"><span class="toc-number">4.</span> <span class="toc-text">开始之前</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Github地址与QQ交流群"><span class="toc-number">5.</span> <span class="toc-text">Github地址与QQ交流群</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#加群之后"><span class="toc-number">6.</span> <span class="toc-text">加群之后</span></a></li></ol>
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<aside class="clearfix">
+
+  
+
+  
+<div class="tagslist">
+	<p class="asidetitle">Tags</p>
+		<ul class="clearfix">
+		
+			<li><a href="/tags/android/" title="android">android<sup>1</sup></a></li>
+		
+			<li><a href="/tags/设计模式，Android/" title="设计模式，Android">设计模式，Android<sup>1</sup></a></li>
+		
+			<li><a href="/tags/面向对象/" title="面向对象">面向对象<sup>1</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  <div class="rsspart">
+	<a href="null" target="_blank" title="rss">RSS</a>
+</div>
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<div class="social-font clearfix">
+		
+		
+		
+		
+		
+	</div>
+		<p class="copyright">Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/A-limon/pacman" target="_blank" title="Pacman">Pacman</a> © 2015 
+		
+		<a href="http://www.simplecoder.cn" target="_blank" title="Mr.Simple">Mr.Simple</a>
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.1.0.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+
+<script type="text/javascript">
+  var duoshuoQuery = {short_name:"null"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script> 
+
+
+
+
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+ga('create', 'null', 'null');  
+ga('send', 'pageview');
+</script>
+
+
+  </body>
+</html>
