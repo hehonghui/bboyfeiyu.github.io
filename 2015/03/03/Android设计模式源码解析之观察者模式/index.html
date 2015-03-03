@@ -1,0 +1,407 @@
+
+ <!DOCTYPE HTML>
+<html lang="Chinese">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>Mr.Simple&#39;s Blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
+    
+    <meta name="author" content="Mr.Simple">
+    
+    <meta name="description" content="title: Android设计模式源码解析之观察者模式date: 2015-03-03 17:50:08
+tags:[设计模式,Android，源码]
+1. 模式介绍
+模式的定义
+定义对象间一种一对多的依赖关系，使得每当一个对象改变状态，则所有依赖于它的对象都会得到通知并被自动更新。
+模式的使用场">
+    
+    
+    
+    
+    
+    <link rel="icon" href="/img/favicon.png">
+    
+    
+    <link rel="apple-touch-icon" href="/img/header.png">
+    <link rel="apple-touch-icon-precomposed" href="/img/header.png">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/header.png" alt="Mr.Simple&#39;s Blog" title="Mr.Simple&#39;s Blog"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Mr.Simple&#39;s Blog">Mr.Simple&#39;s Blog</a></h1>
+				<h2 class="blog-motto">KEEP IT SIMPLE AND STUPID!</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="http://blog.csdn.net/bboyfeiyu">CSDN Blog</a></li>
+					
+						<li><a href="https://github.com/bboyfeiyu">Github</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+					<li>
+					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="text" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:www.simplecoder.cn">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/03/03/Android设计模式源码解析之观察者模式/" title="" itemprop="url"></a>
+  </h1>
+  <p class="article-author">By
+    
+      <a href="http://www.simplecoder.cn" title="Mr.Simple">Mr.Simple</a>
+    </p>
+  <p class="article-time">
+    <time datetime="2015-03-03T09:51:33.000Z" itemprop="datePublished">Mar 3 2015</time>
+    Updated:<time datetime="2015-03-03T09:51:33.000Z" itemprop="dateModified">Mar 3 2015</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">Contents</strong>
+		<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#tags:[设计模式,Android，源码]"><span class="toc-number">1.</span> <span class="toc-text">tags:[设计模式,Android，源码]</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-_模式介绍"><span class="toc-number">2.</span> <span class="toc-text">1. 模式介绍</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#模式的定义"><span class="toc-number">2.1.</span> <span class="toc-text">模式的定义</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#模式的使用场景"><span class="toc-number">2.2.</span> <span class="toc-text">模式的使用场景</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-_UML类图"><span class="toc-number">3.</span> <span class="toc-text">2. UML类图</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#角色介绍"><span class="toc-number">3.1.</span> <span class="toc-text">角色介绍</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-_模式的简单实现"><span class="toc-number">4.</span> <span class="toc-text">3. 模式的简单实现</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#简单实现的介绍"><span class="toc-number">4.1.</span> <span class="toc-text">简单实现的介绍</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#实现源码"><span class="toc-number">4.2.</span> <span class="toc-text">实现源码</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Android源码中的模式实现"><span class="toc-number">5.</span> <span class="toc-text">Android源码中的模式实现</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-_杂谈"><span class="toc-number">6.</span> <span class="toc-text">4. 杂谈</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#优点"><span class="toc-number">6.1.</span> <span class="toc-text">优点</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#缺点"><span class="toc-number">6.2.</span> <span class="toc-text">缺点</span></a></li></ol></li></ol>
+		</div>
+		
+		<p>title: Android设计模式源码解析之观察者模式<br>date: 2015-03-03 17:50:08</p>
+<h2 id="tags:[设计模式,Android，源码]">tags:[设计模式,Android，源码]</h2>
+<h2 id="1-_模式介绍">1. 模式介绍</h2>
+<h3 id="模式的定义">模式的定义</h3>
+<p>定义对象间一种一对多的依赖关系，使得每当一个对象改变状态，则所有依赖于它的对象都会得到通知并被自动更新。</p>
+<h3 id="模式的使用场景">模式的使用场景</h3>
+<ul>
+<li>关联行为场景。需要注意的是，关联行为是可拆分的，而不是“组合”关系；</li>
+<li>事件多级触发场景；</li>
+<li>跨系统的消息交换场景，如消息队列、事件总线的处理机制。</li>
+</ul>
+<h2 id="2-_UML类图">2. UML类图</h2>
+<p><img src="http://img.blog.csdn.net/20150303170429313" alt="uml"> </p>
+<h3 id="角色介绍">角色介绍</h3>
+<ul>
+<li><p>抽象主题 (Subject) 角色<br>抽象主题角色把所有观察者对象的引用保存在一个聚集（比如ArrayList对象）里，每个主题都可以有任意数量的观察者。抽象主题提供一个接口，可以增加和删除观察者对象，抽象主题角色又叫做抽象被观察者(Observable)角色。</p>
+</li>
+<li><p>具体主题 (ConcreteSubject) 角色<br>将有关状态存入具体观察者对象；在具体主题的内部状态改变时，给所有登记过的观察者发出通知。具体主题角色又叫做具体被观察者(Concrete Observable)角色。</p>
+</li>
+<li><p>抽象观察者 (Observer) 角色<br>为所有的具体观察者定义一个接口，在得到主题的通知时更新自己，这个接口叫做更新接口。</p>
+</li>
+<li><p>具体观察者 (ConcreteObserver) 角色<br>存储与主题的状态自恰的状态。具体观察者角色实现抽象观察者角色所要求的更新接口，以便使本身的状态与主题的状态 像协调。如果需要，具体观察者角色可以保持一个指向具体主题对象的引用。</p>
+</li>
+</ul>
+<h2 id="3-_模式的简单实现">3. 模式的简单实现</h2>
+<h3 id="简单实现的介绍">简单实现的介绍</h3>
+<p><a href="http://androidweekly.net/" target="_blank" rel="external">AndroidWeekly</a>是一个每周都会发布关于Android新技术、开源库、招聘信息等内容的网站，在这里我们可以看到最新的技术，最牛X的工程师，经常逛逛这类网站不仅能够开阔我们的眼界，也能让我们接触到最前言的科技信息。这其实就是一个RSS系统，用户订阅Android Weekly的文章，每当有更新的时候将新的内容推送给订阅用户。这不就是观察者模式吗？观察者模式的另一个名字叫做发布-订阅模式，下图就是我订阅AndroidWeekly之后他们发来的确认邮件。下面让我们来简单模拟一下AndroidWeekly的发布过程吧！       </p>
+<p><img src="http://img.blog.csdn.net/20150303170458719" alt="android-weekly"></p>
+<h3 id="实现源码">实现源码</h3>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div></pre></td><td class="code"><pre><div class="line"><span class="javadoc">/**</span></div><div class="line"> * 程序员是观察者</div><div class="line"> * </div><div class="line"> *<span class="javadoctag"> @author</span> mrsimple</div><div class="line"> */</div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Coder</span> <span class="keyword">implements</span> <span class="title">Observer</span> </span>{</div><div class="line">    <span class="keyword">public</span> String name ;</div><div class="line">    </div><div class="line">    <span class="keyword">public</span> <span class="title">Coder</span>(String aName) {</div><div class="line">        name = aName ;</div><div class="line">    }</div><div class="line">    </div><div class="line">    <span class="annotation">@Override</span></div><div class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title">update</span>(Observable o, Object arg) {</div><div class="line">        System.out.println( <span class="string">"Hi, "</span> +  name + <span class="string">", AndroidWeekly更新啦, 内容 : "</span> + arg);</div><div class="line">    }</div><div class="line">    </div><div class="line">    <span class="annotation">@Override</span></div><div class="line">    <span class="keyword">public</span> String <span class="title">toString</span>() {</div><div class="line">        <span class="keyword">return</span> <span class="string">"码农 : "</span> + name;</div><div class="line">    }</div><div class="line"></div><div class="line">}</div><div class="line"></div><div class="line"></div><div class="line"><span class="javadoc">/**</span></div><div class="line"> * AndroidWeekly这个网站是被观察者,它有更新所有的观察者 (这里是程序员) 都会接到相应的通知.</div><div class="line"> * </div><div class="line"> *<span class="javadoctag"> @author</span> mrsimple</div><div class="line"> */</div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">AndroidWeekly</span> <span class="keyword">extends</span> <span class="title">Observable</span> </span>{</div><div class="line"></div><div class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title">postNewPublication</span>(String content) {</div><div class="line">    	<span class="comment">// 标识状态或者内容发生改变</span></div><div class="line">        setChanged();</div><div class="line">        <span class="comment">// 通知所有观察者</span></div><div class="line">        notifyObservers(content);</div><div class="line">    }</div><div class="line">}</div><div class="line"></div><div class="line"><span class="comment">// 测试代码</span></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Test</span> </span>{</div><div class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span>(String[] args) {</div><div class="line">        <span class="comment">// 被观察的角色</span></div><div class="line">        AndroidWeekly androidWeekly = <span class="keyword">new</span> AndroidWeekly();</div><div class="line">        <span class="comment">// 观察者</span></div><div class="line">        Coder mrsimple = <span class="keyword">new</span> Coder(<span class="string">"mr.simple"</span>);</div><div class="line">        Coder coder1 = <span class="keyword">new</span> Coder(<span class="string">"coder-1"</span>);</div><div class="line">        Coder coder2 = <span class="keyword">new</span> Coder(<span class="string">"coder-2"</span>);</div><div class="line">        Coder coder3 = <span class="keyword">new</span> Coder(<span class="string">"coder-3"</span>);</div><div class="line"></div><div class="line">        <span class="comment">// 将观察者注册到可观察对象的观察者列表中</span></div><div class="line">        androidWeekly.addObserver(mrsimple);</div><div class="line">        androidWeekly.addObserver(coder1);</div><div class="line">        androidWeekly.addObserver(coder2);</div><div class="line">        androidWeekly.addObserver(coder3);</div><div class="line"></div><div class="line">        <span class="comment">// 发布消息</span></div><div class="line">        androidWeekly.postNewPublication(<span class="string">"新的一期AndroidWeekly来啦!"</span>);</div><div class="line">    }</div><div class="line"></div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>输入结果: </p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="variable">Hi</span>, <span class="function_or_atom">coder</span>-<span class="number">3</span>, <span class="variable">AndroidWeekly</span>更新啦, 内容 : 新的一期<span class="variable">AndroidWeekly</span>来啦<span class="exclamation_mark">!</span></div><div class="line"><span class="variable">Hi</span>, <span class="function_or_atom">coder</span>-<span class="number">2</span>, <span class="variable">AndroidWeekly</span>更新啦, 内容 : 新的一期<span class="variable">AndroidWeekly</span>来啦<span class="exclamation_mark">!</span></div><div class="line"><span class="variable">Hi</span>, <span class="function_or_atom">coder</span>-<span class="number">1</span>, <span class="variable">AndroidWeekly</span>更新啦, 内容 : 新的一期<span class="variable">AndroidWeekly</span>来啦<span class="exclamation_mark">!</span></div><div class="line"><span class="variable">Hi</span>, <span class="function_or_atom">mr</span>.<span class="function_or_atom">simple</span>, <span class="variable">AndroidWeekly</span>更新啦, 内容 : 新的一期<span class="variable">AndroidWeekly</span>来啦<span class="exclamation_mark">!</span></div></pre></td></tr></table></figure>
+
+
+<p>可以看到所有订阅了AndroidWeekly的用户都受到了更新消息，一对多的订阅-发布系统这么简单就完成了。      </p>
+<p>这里Observer是抽象的观察者角色，Coder扮演的是具体观察者的角色；Observable对应的是抽象主题角色，AndroidWeekly则是具体的主题角色。Coder是具体的观察者，他们订阅了AndroidWeekly这个具体的可观察对象，当AndroidWeekly有更新时，会遍历所有观察者 ( 这里是Coder码农 )，然后给这些观察者发布一个更新的消息，即调用Coder中的update方法，这样就达到了1对多的通知功能。Observer和Observable都已经内置在jdk中，可见观察者模式在java中的重要性。       </p>
+<h2 id="Android源码中的模式实现">Android源码中的模式实现</h2>
+<p>ListView是Android中最重要的控件，没有之一。而ListView最重要的一个点就是Adapter，在<a href="http://blog.csdn.net/bboyfeiyu/article/details/43950185" target="_blank" rel="external">Android设计模式源码解析之适配器(Adapter)模式</a>中我们分析了Adapter模式，在我们往ListView添加数据后，我们都会调用一个方法: notifyDataSetChanged(), 这是为什么呢？  今天我们就来揭开它的神秘面纱。       </p>
+<p>第一步我们就跟进这个方法notifyDataSetChanged方法，这个方法定义在BaseAdapter中，代码如下: </p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">BaseAdapter</span> <span class="keyword">implements</span> <span class="title">ListAdapter</span>, <span class="title">SpinnerAdapter</span> </span>{</div><div class="line">	<span class="comment">// 数据集观察者</span></div><div class="line">    <span class="keyword">private</span> <span class="keyword">final</span> DataSetObservable mDataSetObservable = <span class="keyword">new</span> DataSetObservable();</div><div class="line"></div><div class="line">    <span class="comment">// 代码省略</span></div><div class="line">    </div><div class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title">registerDataSetObserver</span>(DataSetObserver observer) {</div><div class="line">        mDataSetObservable.registerObserver(observer);</div><div class="line">    }</div><div class="line"></div><div class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title">unregisterDataSetObserver</span>(DataSetObserver observer) {</div><div class="line">        mDataSetObservable.unregisterObserver(observer);</div><div class="line">    }</div><div class="line">    </div><div class="line">    <span class="javadoc">/**</span></div><div class="line">     * Notifies the attached observers that the underlying data has been changed</div><div class="line">     * and any View reflecting the data set should refresh itself.</div><div class="line">     * 当数据集用变化时通知所有观察者</div><div class="line">     */</div><div class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title">notifyDataSetChanged</span>() {</div><div class="line">        mDataSetObservable.notifyChanged();</div><div class="line">    }</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>我们一看BaseAdapter上述代码，大体有了这么一个了解，原来BaseAdapter是一个观察者模式！<br>那么BaseAdapter是如何运作的？ 这些观察者又是什么呢？我们一步一步来分析。     </p>
+<p>我们先跟到mDataSetObservable.notifyChanged()函数中看看。     </p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line"><span class="javadoc">/**</span></div><div class="line"> * A specialization of Observable for DataSetObserver that provides methods for</div><div class="line"> * invoking the various callback methods of DataSetObserver.</div><div class="line"> */</div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">DataSetObservable</span> <span class="keyword">extends</span> <span class="title">Observable</span>&lt;<span class="title">DataSetObserver</span>&gt; </span>{</div><div class="line">    <span class="javadoc">/**</span></div><div class="line">     * Invokes onChanged on each observer. Called when the data set being observed has</div><div class="line">     * changed, and which when read contains the new state of the data.</div><div class="line">     */</div><div class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title">notifyChanged</span>() {</div><div class="line">        <span class="keyword">synchronized</span>(mObservers) {</div><div class="line">            <span class="comment">// 调用所有观察者的onChanged方式</span></div><div class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> i = mObservers.size() - <span class="number">1</span>; i &gt;= <span class="number">0</span>; i--) {</div><div class="line">                mObservers.get(i).onChanged();</div><div class="line">            }</div><div class="line">        }</div><div class="line">    }</div><div class="line">	<span class="comment">// 代码省略</span></div><div class="line">}</div></pre></td></tr></table></figure>
+
+
+<p>恩，代码很简单，就是在mDataSetObservable.notifyChanged()中遍历所有观察者，并且调用它们的onChanged方法。        </p>
+<p>那么这些观察者是从哪里来的呢？首先ListView通过setAdapter方法来设置Adapter,我们看看相关代码。     </p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div></pre></td><td class="code"><pre><div class="line"> <span class="annotation">@Override</span></div><div class="line"> <span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setAdapter</span>(ListAdapter adapter) {</div><div class="line"> 	<span class="comment">// 如果已经有了一个adapter,那么先注销该Adapter对应的观察者</span></div><div class="line">     <span class="keyword">if</span> (mAdapter != <span class="keyword">null</span> && mDataSetObserver != <span class="keyword">null</span>) {</div><div class="line">         mAdapter.unregisterDataSetObserver(mDataSetObserver);</div><div class="line">     }</div><div class="line"></div><div class="line">  	<span class="comment">// 代码省略</span></div><div class="line"></div><div class="line">     <span class="keyword">super</span>.setAdapter(adapter);</div><div class="line"></div><div class="line">     <span class="keyword">if</span> (mAdapter != <span class="keyword">null</span>) {</div><div class="line">         mAreAllItemsSelectable = mAdapter.areAllItemsEnabled();</div><div class="line">         mOldItemCount = mItemCount;</div><div class="line">         <span class="comment">// 获取数据的数量</span></div><div class="line">         mItemCount = mAdapter.getCount();</div><div class="line">         checkFocus();</div><div class="line"><span class="comment">// 注意这里 : 创建一个一个数据集观察者</span></div><div class="line">         mDataSetObserver = <span class="keyword">new</span> AdapterDataSetObserver();</div><div class="line">         <span class="comment">// 将这个观察者注册到Adapter中，实际上是注册到DataSetObservable中</span></div><div class="line">         mAdapter.registerDataSetObserver(mDataSetObserver);</div><div class="line"></div><div class="line">			<span class="comment">// 代码省略</span></div><div class="line">     } <span class="keyword">else</span> {</div><div class="line">         <span class="comment">// 代码省略</span></div><div class="line">     }</div><div class="line"></div><div class="line">     requestLayout();</div><div class="line"> }</div></pre></td></tr></table></figure>
+
+<p>可以看到在设置Adapter时会构建一个AdapterDataSetObserver，这不就是我们上面所说的观察者么，最后将这个观察者注册到adapter中，这样我们的被观察者、观察者都有了。一般来说我们的数据集会放到Adapter中，例如 :     </p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">UserAdapter</span> <span class="keyword">extends</span> <span class="title">BaseAdapter</span> </span>{</div><div class="line">	<span class="comment">// 数据集</span></div><div class="line">    <span class="keyword">protected</span> List&lt;String&gt; mDataSet = <span class="keyword">new</span> LinkedList&lt;String&gt;();</div><div class="line">    <span class="keyword">protected</span> Context mContext = <span class="keyword">null</span>;</div><div class="line"></div><div class="line">    <span class="keyword">public</span> <span class="title">CommonAdapter</span>(Context context, List&lt;String&gt; dataSet) {</div><div class="line">        <span class="keyword">this</span>.mDataSet = dataSet;</div><div class="line">        <span class="keyword">this</span>.mContext = context;</div><div class="line">    }</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>这个时候可能你就有点晕了？  AdapterDataSetObserver是什么？它是如何运作的？那么我就先来看看AdapterDataSetObserver吧。       </p>
+<p>AdapterDataSetObserver定义在ListView的父类AbsListView中，代码如下 :    </p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">AdapterDataSetObserver</span> <span class="inheritance"><span class="keyword">extends</span></span> <span class="title">AdapterView</span>&lt;<span class="title">ListAdapter</span>&gt;.<span class="title">AdapterDataSetObserver</span> </span>{</div><div class="line">    @Override</div><div class="line">    <span class="keyword">public</span> <span class="keyword">void</span> onChanged() {</div><div class="line">        <span class="keyword">super</span>.onChanged();</div><div class="line">        <span class="keyword">if</span> (mFastScroller != <span class="keyword">null</span>) {</div><div class="line">            mFastScroller.onSectionsChanged();</div><div class="line">        }</div><div class="line">    }</div><div class="line"></div><div class="line">    @Override</div><div class="line">    <span class="keyword">public</span> <span class="keyword">void</span> onInvalidated() {</div><div class="line">        <span class="keyword">super</span>.onInvalidated();</div><div class="line">        <span class="keyword">if</span> (mFastScroller != <span class="keyword">null</span>) {</div><div class="line">            mFastScroller.onSectionsChanged();</div><div class="line">        }</div><div class="line">    }</div><div class="line">}</div></pre></td></tr></table></figure>
+
+
+<p>它由继承自AbsListView的父类AdapterView<t>的AdapterDataSetObserver, 代码如下 : </t></p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div></pre></td><td class="code"><pre><div class="line">  <span class="class"><span class="keyword">class</span> <span class="title">AdapterDataSetObserver</span> <span class="inheritance"><span class="keyword">extends</span></span> <span class="title">DataSetObserver</span> </span>{</div><div class="line"></div><div class="line">      <span class="keyword">private</span> Parcelable mInstanceState = <span class="keyword">null</span>;</div><div class="line"><span class="comment">// 上文有说道，调用Adapter的notifyDataSetChanged的时候会调用所有观察者的onChanged方法,核心实现就在这里</span></div><div class="line">      @Override</div><div class="line">      <span class="keyword">public</span> <span class="keyword">void</span> onChanged() {</div><div class="line">          mDataChanged = <span class="keyword">true</span>;</div><div class="line">          mOldItemCount = mItemCount;</div><div class="line">          <span class="comment">// 获取Adapter中数据的数量</span></div><div class="line">          mItemCount = getAdapter().getCount();</div><div class="line"></div><div class="line">          <span class="comment">// Detect the case where a cursor that was previously invalidated has</span></div><div class="line">          <span class="comment">// been repopulated with new data.</span></div><div class="line">          <span class="keyword">if</span> (AdapterView.<span class="keyword">this</span>.getAdapter().hasStableIds() && mInstanceState != <span class="keyword">null</span></div><div class="line">                  && mOldItemCount == <span class="number">0</span> && mItemCount &gt; <span class="number">0</span>) {</div><div class="line">              AdapterView.<span class="keyword">this</span>.onRestoreInstanceState(mInstanceState);</div><div class="line">              mInstanceState = <span class="keyword">null</span>;</div><div class="line">          } <span class="keyword">else</span> {</div><div class="line">              rememberSyncState();</div><div class="line">          }</div><div class="line">          checkFocus();</div><div class="line">          <span class="comment">// 重新布局ListView、GridView等AdapterView组件</span></div><div class="line">          requestLayout();</div><div class="line">      }</div><div class="line"></div><div class="line">      <span class="comment">// 代码省略</span></div><div class="line"></div><div class="line">      <span class="keyword">public</span> <span class="keyword">void</span> clearSavedState() {</div><div class="line">          mInstanceState = <span class="keyword">null</span>;</div><div class="line">      }</div><div class="line">  }</div></pre></td></tr></table></figure>
+
+<p>到这里我们就知道了，当ListView的数据发生变化时，调用Adapter的notifyDataSetChanged函数，这个函数又会调用DataSetObservable的notifyChanged函数，这个函数会调用所有观察者 (AdapterDataSetObserver) 的onChanged方法。这就是一个观察者模式！         </p>
+<p><strong><font color="red">最后我们再捋一捋,AdapterView中有一个内部类AdapterDataSetObserver,在ListView设置Adapter时会构建一个AdapterDataSetObserver，并且注册到Adapter中，这个就是一个观察者。而Adapter中包含一个数据集可观察者DataSetObservable，在数据数量发生变更时开发者手动调用AdapternotifyDataSetChanged，而notifyDataSetChanged实际上会调用DataSetObservable的notifyChanged函数，该函数会遍历所有观察者的onChanged函数。在AdapterDataSetObserver的onChanged函数中会获取Adapter中数据集的新数量，然后调用ListView的requestLayout()方法重新进行布局，更新用户界面。</font></strong>       </p>
+<table>
+<thead>
+<tr>
+<th><img src="http://img.blog.csdn.net/20150303170502721" alt="img1"></th>
+<th><img src="http://img.blog.csdn.net/20150303170557615" alt="img1"></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>图1</td>
+<td>图2</td>
+</tr>
+</tbody>
+</table>
+<p>这篇文章来自SAOS开源项目组，关于SAOS的介绍请参考<a href="http://blog.csdn.net/bboyfeiyu/article/details/44006189" target="_blank" rel="external">Android开源库与设计模式开源组SAOS</a>，更多文章请移步到<a href="https://github.com/simple-android-framework-exchange" target="_blank" rel="external">SAOS开源项目组</a>;</p>
+<h2 id="4-_杂谈">4. 杂谈</h2>
+<p>ListView主要运用了Adapter和观察者模式使得可扩展性、灵活性非常强，而耦合度却很低，这是我认为设计模式在Android源码中优秀运用的典范。那么为什么Android架构师们会这么设计ListView，它们如何达到低耦合、高灵活性呢？这个留给大家思考吧，如果有时间我再分享我的看法。        </p>
+<h3 id="优点">优点</h3>
+<ul>
+<li>观察者和被观察者之间是抽象耦合</li>
+</ul>
+<h3 id="缺点">缺点</h3>
+<ul>
+<li>观察者模式需要考虑一下开发效率和运行效率问题，一个被观察者，多个观察者，开发和调试就会比较复杂，而且在 Java 中消息的通知默认是顺序执行，一个观察者卡壳，会影响整体的执行效率。在这种情况下，一般考虑采用异步的方式。</li>
+</ul>
+  
+	</div>
+		<footer class="article-footer clearfix">
+
+
+
+
+<div class="article-share" id="share">
+
+  
+<div class="jiathis_style">
+    <span class="jiathis_txt">分享到：</span>
+    <a class="jiathis_button_tsina">新浪微博</a>
+    <a class="jiathis_button_weixin">微信</a>
+    <a class="jiathis_button_twitter">Twitter</a>
+    <a class="jiathis_button_evernote">EverNote</a>
+    <a href="http://www.jiathis.com/share?uid=1501277" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank">更多</a>
+</div>
+<script type="text/javascript" >
+    var jiathis_config={
+    data_track_clickback:true,
+    sm:"copy,renren,cqq",
+    pic:"",
+    summary:"",
+    
+  </script> 
+<script type="text/javascript" src="//v3.jiathis.com/code/jia.js?uid=
+" charset="utf-8"></script>      
+
+
+</div>
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+
+<div class="next">
+<a href="/2015/02/20/simple-android-opensource/"  title="Android开源库与设计模式开源组SAOS建立">
+ <strong>NEXT:</strong><br/> 
+ <span>Android开源库与设计模式开源组SAOS建立
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+<section class="comment">
+	<div class="ds-thread"></div>
+</section>
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">Contents</strong>
+  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#tags:[设计模式,Android，源码]"><span class="toc-number">1.</span> <span class="toc-text">tags:[设计模式,Android，源码]</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-_模式介绍"><span class="toc-number">2.</span> <span class="toc-text">1. 模式介绍</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#模式的定义"><span class="toc-number">2.1.</span> <span class="toc-text">模式的定义</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#模式的使用场景"><span class="toc-number">2.2.</span> <span class="toc-text">模式的使用场景</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-_UML类图"><span class="toc-number">3.</span> <span class="toc-text">2. UML类图</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#角色介绍"><span class="toc-number">3.1.</span> <span class="toc-text">角色介绍</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-_模式的简单实现"><span class="toc-number">4.</span> <span class="toc-text">3. 模式的简单实现</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#简单实现的介绍"><span class="toc-number">4.1.</span> <span class="toc-text">简单实现的介绍</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#实现源码"><span class="toc-number">4.2.</span> <span class="toc-text">实现源码</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Android源码中的模式实现"><span class="toc-number">5.</span> <span class="toc-text">Android源码中的模式实现</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-_杂谈"><span class="toc-number">6.</span> <span class="toc-text">4. 杂谈</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#优点"><span class="toc-number">6.1.</span> <span class="toc-text">优点</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#缺点"><span class="toc-number">6.2.</span> <span class="toc-text">缺点</span></a></li></ol></li></ol>
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<aside class="clearfix">
+
+  
+
+  
+<div class="tagslist">
+	<p class="asidetitle">Tags</p>
+		<ul class="clearfix">
+		
+			<li><a href="/tags/android/" title="android">android<sup>1</sup></a></li>
+		
+			<li><a href="/tags/开源库，设计模式，Android/" title="开源库，设计模式，Android">开源库，设计模式，Android<sup>1</sup></a></li>
+		
+			<li><a href="/tags/设计模式，Android/" title="设计模式，Android">设计模式，Android<sup>1</sup></a></li>
+		
+			<li><a href="/tags/面向对象/" title="面向对象">面向对象<sup>1</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  <div class="rsspart">
+	<a href="null" target="_blank" title="rss">RSS</a>
+</div>
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<div class="social-font clearfix">
+		
+		
+		
+		
+		
+	</div>
+		<p class="copyright">Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/A-limon/pacman" target="_blank" title="Pacman">Pacman</a> © 2015 
+		
+		<a href="http://www.simplecoder.cn" target="_blank" title="Mr.Simple">Mr.Simple</a>
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.1.0.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+
+<script type="text/javascript">
+  var duoshuoQuery = {short_name:"null"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script> 
+
+
+
+
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+ga('create', 'null', 'null');  
+ga('send', 'pageview');
+</script>
+
+
+  </body>
+</html>
