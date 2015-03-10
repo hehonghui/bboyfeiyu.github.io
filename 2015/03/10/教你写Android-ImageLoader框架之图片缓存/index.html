@@ -1,0 +1,372 @@
+
+ <!DOCTYPE HTML>
+<html lang="Chinese">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>教你写Android ImageLoader框架之图片缓存 | Mr.Simple&#39;s Blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
+    
+    <meta name="author" content="Mr.Simple">
+    
+    <meta name="description" content="在教你写Android ImageLoader框架系列博文中，我们从基本架构到具体实现已经更新了大部分的内容。今天，我们来讲最后一个关键点，即图片的缓存。为了用户体验，通常情况下我们都会将已经下载的图片缓存起来，一般来说内存和本地都会有图片缓存。那既然是框架，必然需要有很好的定制性，这让我们又自然而">
+    
+    
+    
+    
+    
+    <link rel="icon" href="/img/favicon.png">
+    
+    
+    <link rel="apple-touch-icon" href="/img/header.png">
+    <link rel="apple-touch-icon-precomposed" href="/img/header.png">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/header.png" alt="Mr.Simple&#39;s Blog" title="Mr.Simple&#39;s Blog"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Mr.Simple&#39;s Blog">Mr.Simple&#39;s Blog</a></h1>
+				<h2 class="blog-motto">KEEP IT SIMPLE AND STUPID!</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="http://blog.csdn.net/bboyfeiyu">CSDN Blog</a></li>
+					
+						<li><a href="https://github.com/bboyfeiyu">Github</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+					<li>
+					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="text" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:www.simplecoder.cn">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/03/10/教你写Android-ImageLoader框架之图片缓存/" title="教你写Android ImageLoader框架之图片缓存" itemprop="url">教你写Android ImageLoader框架之图片缓存</a>
+  </h1>
+  <p class="article-author">By
+    
+      <a href="http://www.simplecoder.cn" title="Mr.Simple">Mr.Simple</a>
+    </p>
+  <p class="article-time">
+    <time datetime="2015-03-10T02:38:16.000Z" itemprop="datePublished">Mar 10 2015</time>
+    Updated:<time datetime="2015-03-10T03:35:36.000Z" itemprop="dateModified">Mar 10 2015</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">Contents</strong>
+		<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#缓存接口"><span class="toc-number">1.</span> <span class="toc-text">缓存接口</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#内存缓存"><span class="toc-number">2.</span> <span class="toc-text">内存缓存</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#sd卡缓存"><span class="toc-number">3.</span> <span class="toc-text">sd卡缓存</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#BitmapDecoder"><span class="toc-number">4.</span> <span class="toc-text">BitmapDecoder</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#二级缓存"><span class="toc-number">5.</span> <span class="toc-text">二级缓存</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#自定义缓存"><span class="toc-number">6.</span> <span class="toc-text">自定义缓存</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#总结"><span class="toc-number">7.</span> <span class="toc-text">总结</span></a></li></ol>
+		</div>
+		
+		<p>在<a href="http://blog.csdn.net/column/details/android-imageloader.html" target="_blank" rel="external">教你写Android ImageLoader框架</a>系列博文中，我们从基本架构到具体实现已经更新了大部分的内容。今天，我们来讲最后一个关键点，即图片的缓存。为了用户体验，通常情况下我们都会将已经下载的图片缓存起来，一般来说内存和本地都会有图片缓存。那既然是框架，必然需要有很好的定制性，这让我们又自然而然的想到了抽象。下面我们就一起来看看缓存的实现吧。      </p>
+<h2 id="缓存接口">缓存接口</h2>
+<p>在<a href="http://blog.csdn.net/bboyfeiyu/article/details/44155857" target="_blank" rel="external">教你写Android ImageLoader框架之图片加载与加载策略</a>我们聊到了Loader，然后阐述了AbsLoader的基本逻辑，其中就有图片缓存。因此AbsLoader中必然含有缓存对象的引用。我们看看相关代码: </p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="javadoc">/**</span></div><div class="line"> *<span class="javadoctag"> @author</span> mrsimple</div><div class="line"> */</div><div class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">AbsLoader</span> <span class="keyword">implements</span> <span class="title">Loader</span> </span>{</div><div class="line"></div><div class="line">    <span class="javadoc">/**</span></div><div class="line">     * 图片缓存</div><div class="line">     */</div><div class="line">    <span class="keyword">private</span> <span class="keyword">static</span> BitmapCache mCache = SimpleImageLoader.getInstance().getConfig().bitmapCache;</div><div class="line">    </div><div class="line">    <span class="comment">// 代码省略</span></div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>AbsLoader中定义了一个static的BitmapCache对象，这个就是图片缓存对象。那为什么是static呢？因为不管Loader有多少个，缓存对象都应该是共享的，也就是缓存只有一份。说了那么多，那我们先来了解一下BitmapCache吧。       </p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="keyword">interface</span> BitmapCache {</div><div class="line"></div><div class="line">    <span class="keyword">public</span> Bitmap <span class="title">get</span>(BitmapRequest key);</div><div class="line"></div><div class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title">put</span>(BitmapRequest key, Bitmap <span class="keyword">value</span>);</div><div class="line"></div><div class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title">remove</span>(BitmapRequest key);</div><div class="line"></div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>BitmapCache很简单，只声明了获取、添加、移除三个方法来操作图片缓存。这里有依赖了一个BitmapRequest类，这个类代表了一个图片加载请求，该类中有该请求对应的ImageView、图片uri、显示Config等属性。在缓存这块我们主要要使用图片的uri来检索缓存中是否含有该图片，缓存以图片的uri为key,Bitmap为value来关联存储。另外需要BitmapRequest的ImageView宽度和高度，以此来按尺寸加载图片。           </p>
+<p>定义BitmapCache接口还是为了可扩展性，面向接口的编程的理念又再一次的浮现在你面前。如果是你，你会作何设计呢？自己写代码来练习一下吧，看看自己作何考虑，如果实现，这样你才会从中有更深的领悟。</p>
+<h2 id="内存缓存">内存缓存</h2>
+<p>既然是框架，那就需要接受用户各种各样的需求。但通常来说框架会有一些默认的实现，对于图片缓存来说内存缓存就其中的一个默认实现，它会将已经加载的图片缓存到内存中，大大地提升图片重复加载的速度。内存缓存我们的策略是使用LRU算法，直接使用了support.v4中的LruCache类，相关代码如下。</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div></pre></td><td class="code"><pre><div class="line"><span class="javadoc">/**</span></div><div class="line"> * 图片的内存缓存,key为图片的uri,值为图片本身</div><div class="line"> * </div><div class="line"> *<span class="javadoctag"> @author</span> mrsimple</div><div class="line"> */</div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MemoryCache</span> <span class="keyword">implements</span> <span class="title">BitmapCache</span> </span>{</div><div class="line"></div><div class="line">    <span class="keyword">private</span> LruCache&lt;String, Bitmap&gt; mMemeryCache;</div><div class="line"></div><div class="line">    <span class="keyword">public</span> <span class="title">MemoryCache</span>() {</div><div class="line"></div><div class="line">        <span class="comment">// 计算可使用的最大内存</span></div><div class="line">        <span class="keyword">final</span> <span class="keyword">int</span> maxMemory = (<span class="keyword">int</span>) (Runtime.getRuntime().maxMemory() / <span class="number">1024</span>);</div><div class="line"></div><div class="line">        <span class="comment">// 取4分之一的可用内存作为缓存</span></div><div class="line">        <span class="keyword">final</span> <span class="keyword">int</span> cacheSize = maxMemory / <span class="number">4</span>;</div><div class="line">        mMemeryCache = <span class="keyword">new</span> LruCache&lt;String, Bitmap&gt;(cacheSize) {</div><div class="line"></div><div class="line">            <span class="annotation">@Override</span></div><div class="line">            <span class="keyword">protected</span> <span class="keyword">int</span> <span class="title">sizeOf</span>(String key, Bitmap bitmap) {</div><div class="line">                <span class="keyword">return</span> bitmap.getRowBytes() * bitmap.getHeight() / <span class="number">1024</span>;</div><div class="line">            }</div><div class="line">        };</div><div class="line"></div><div class="line">    }</div><div class="line"></div><div class="line">    <span class="annotation">@Override</span></div><div class="line">    <span class="keyword">public</span> Bitmap <span class="title">get</span>(BitmapRequest key) {</div><div class="line">        <span class="keyword">return</span> mMemeryCache.get(key.imageUri);</div><div class="line">    }</div><div class="line"></div><div class="line">    <span class="annotation">@Override</span></div><div class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title">put</span>(BitmapRequest key, Bitmap value) {</div><div class="line">        mMemeryCache.put(key.imageUri, value);</div><div class="line">    }</div><div class="line"></div><div class="line">    <span class="annotation">@Override</span></div><div class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title">remove</span>(BitmapRequest key) {</div><div class="line">        mMemeryCache.remove(key.imageUri);</div><div class="line">    }</div><div class="line"></div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>就是简单的实现了BitmapCache接口，然后内部使用LruCache类实现内存缓存。比较简单，就不做说明了。</p>
+<h2 id="sd卡缓存">sd卡缓存</h2>
+<p>对于图片缓存，内存缓存是不够的，更多的需要是将图片缓存到sd卡中，这样用户在下次进入app时可以直接从本地加载图片，避免重复地从网络上读取图片数据，即耗流量，用户体验又不好。sd卡缓存我们使用了Jake Wharton的DiskLruCache类，我们的sd卡缓存类为DiskCache,代码如下 : </p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div><div class="line">97</div><div class="line">98</div><div class="line">99</div><div class="line">100</div><div class="line">101</div><div class="line">102</div><div class="line">103</div><div class="line">104</div><div class="line">105</div><div class="line">106</div><div class="line">107</div><div class="line">108</div><div class="line">109</div><div class="line">110</div><div class="line">111</div><div class="line">112</div><div class="line">113</div><div class="line">114</div><div class="line">115</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">DiskCache</span> <span class="keyword">implements</span> <span class="title">BitmapCache</span> </span>{</div><div class="line"></div><div class="line">    <span class="javadoc">/**</span></div><div class="line">     * 1MB</div><div class="line">     */</div><div class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> MB = <span class="number">1024</span> * <span class="number">1024</span>;</div><div class="line"></div><div class="line">    <span class="javadoc">/**</span></div><div class="line">     * cache dir</div><div class="line">     */</div><div class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> String IMAGE_DISK_CACHE = <span class="string">"bitmap"</span>;</div><div class="line">    <span class="javadoc">/**</span></div><div class="line">     * Disk LRU Cache</div><div class="line">     */</div><div class="line">    <span class="keyword">private</span> DiskLruCache mDiskLruCache;</div><div class="line">    <span class="javadoc">/**</span></div><div class="line">     * Disk Cache Instance</div><div class="line">     */</div><div class="line">    <span class="keyword">private</span> <span class="keyword">static</span> DiskCache mDiskCache;</div><div class="line"></div><div class="line">    <span class="javadoc">/**</span></div><div class="line">     *<span class="javadoctag"> @param</span> context</div><div class="line">     */</div><div class="line">    <span class="keyword">private</span> <span class="title">DiskCache</span>(Context context) {</div><div class="line">        initDiskCache(context);</div><div class="line">    }</div><div class="line"></div><div class="line">    <span class="keyword">public</span> <span class="keyword">static</span> DiskCache <span class="title">getDiskCache</span>(Context context) {</div><div class="line">        <span class="keyword">if</span> (mDiskCache == <span class="keyword">null</span>) {</div><div class="line">            <span class="keyword">synchronized</span> (DiskCache.class) {</div><div class="line">                <span class="keyword">if</span> (mDiskCache == <span class="keyword">null</span>) {</div><div class="line">                    mDiskCache = <span class="keyword">new</span> DiskCache(context);</div><div class="line">                }</div><div class="line">            }</div><div class="line"></div><div class="line">        }</div><div class="line">        <span class="keyword">return</span> mDiskCache;</div><div class="line">    }</div><div class="line">    </div><div class="line">    <span class="javadoc">/**</span></div><div class="line">     * 初始化sdcard缓存</div><div class="line">     */</div><div class="line">    <span class="keyword">private</span> <span class="keyword">void</span> <span class="title">initDiskCache</span>(Context context) {</div><div class="line">        <span class="keyword">try</span> {</div><div class="line">            File cacheDir = getDiskCacheDir(context, IMAGE_DISK_CACHE);</div><div class="line">            <span class="keyword">if</span> (!cacheDir.exists()) {</div><div class="line">                cacheDir.mkdirs();</div><div class="line">            }</div><div class="line">            mDiskLruCache = DiskLruCache</div><div class="line">                    .open(cacheDir, getAppVersion(context), <span class="number">1</span>, <span class="number">50</span> * MB);</div><div class="line">        } <span class="keyword">catch</span> (IOException e) {</div><div class="line">            e.printStackTrace();</div><div class="line">        }</div><div class="line">    }</div><div class="line"></div><div class="line">    <span class="javadoc">/**</span></div><div class="line">     * 获取sd缓存的目录,如果挂载了sd卡则使用sd卡缓存，否则使用应用的缓存目录。</div><div class="line">     *<span class="javadoctag"> @param</span> context Context</div><div class="line">     *<span class="javadoctag"> @param</span> uniqueName 缓存目录名,比如bitmap</div><div class="line">     *<span class="javadoctag"> @return</span></div><div class="line">     */</div><div class="line">    <span class="keyword">public</span> File <span class="title">getDiskCacheDir</span>(Context context, String uniqueName) {</div><div class="line">        String cachePath;</div><div class="line">        <span class="keyword">if</span> (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {</div><div class="line">            Log.d(<span class="string">""</span>, <span class="string">"### context : "</span> + context + <span class="string">", dir = "</span> + context.getExternalCacheDir());</div><div class="line">            cachePath = context.getExternalCacheDir().getPath();</div><div class="line">        } <span class="keyword">else</span> {</div><div class="line">            cachePath = context.getCacheDir().getPath();</div><div class="line">        }</div><div class="line">        <span class="keyword">return</span> <span class="keyword">new</span> File(cachePath + File.separator + uniqueName);</div><div class="line">    }</div><div class="line">    </div><div class="line">    </div><div class="line">        <span class="annotation">@Override</span></div><div class="line">    <span class="keyword">public</span> <span class="keyword">synchronized</span> Bitmap <span class="title">get</span>(<span class="keyword">final</span> BitmapRequest bean) {</div><div class="line">        <span class="comment">// 图片解析器</span></div><div class="line">        BitmapDecoder decoder = <span class="keyword">new</span> BitmapDecoder() {</div><div class="line"></div><div class="line">            <span class="annotation">@Override</span></div><div class="line">            <span class="keyword">public</span> Bitmap <span class="title">decodeBitmapWithOption</span>(Options options) {</div><div class="line">                <span class="keyword">final</span> InputStream inputStream = getInputStream(bean.imageUriMd5);</div><div class="line">                Bitmap bitmap = BitmapFactory.decodeStream(inputStream, <span class="keyword">null</span>,</div><div class="line">                        options);</div><div class="line">                IOUtil.closeQuietly(inputStream);</div><div class="line">                <span class="keyword">return</span> bitmap;</div><div class="line">            }</div><div class="line">        };</div><div class="line"></div><div class="line">        <span class="keyword">return</span> decoder.decodeBitmap(bean.getImageViewWidth(),</div><div class="line">                bean.getImageViewHeight());</div><div class="line">    }</div><div class="line"></div><div class="line">    <span class="keyword">private</span> InputStream <span class="title">getInputStream</span>(String md5) {</div><div class="line">        Snapshot snapshot;</div><div class="line">        <span class="keyword">try</span> {</div><div class="line">            snapshot = mDiskLruCache.get(md5);</div><div class="line">            <span class="keyword">if</span> (snapshot != <span class="keyword">null</span>) {</div><div class="line">                <span class="keyword">return</span> snapshot.getInputStream(<span class="number">0</span>);</div><div class="line">            }</div><div class="line">        } <span class="keyword">catch</span> (IOException e) {</div><div class="line">            e.printStackTrace();</div><div class="line">        }</div><div class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;</div><div class="line">    }</div><div class="line">    </div><div class="line">    </div><div class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title">put</span>(BitmapRequest key, Bitmap value) {</div><div class="line">        <span class="comment">// 代码省略 </span></div><div class="line">    }</div><div class="line"></div><div class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title">remove</span>(BitmapRequest key) {</div><div class="line">    	<span class="comment">// 代码省略</span></div><div class="line">    }</div><div class="line">    </div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>代码比较简单，也就是实现BitmapCache，然后包装一下DiskLruCache类的方法实现图片文件的增加、删除、获取方法。这里给大家介绍一个类，是我为了简化图片按ImageView尺寸加载的辅助类，即BitmapDecoder。</p>
+<h2 id="BitmapDecoder">BitmapDecoder</h2>
+<p>BitmapDecoder是一个按ImageView尺寸加载图片的辅助类，一般我加载图片的过程是这样的: </p>
+<ol>
+<li>创建BitmapFactory.Options options,设置options.inJustDecodeBounds = true，使得只解析图片尺寸等信息;</li>
+<li>根据ImageView的尺寸来检查是否需要缩小要加载的图片以及计算缩放比例;</li>
+<li>设置options.inJustDecodeBounds = false,然后按照options设置的缩小比例来加载图片.</li>
+</ol>
+<p>BitmapDecoder类使用decodeBitmap方法封装了这个过程 ( 模板方法噢 ),用户只需要实现一个子类，并且覆写BitmapDecoder的decodeBitmapWithOption实现图片加载即可完成这个过程(参考DiskCache中的get方法)。代码如下 : </p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div></pre></td><td class="code"><pre><div class="line"><span class="javadoc">/**</span></div><div class="line"> * 封装先加载图片bound，计算出inSmallSize之后再加载图片的逻辑操作</div><div class="line"> * </div><div class="line"> *<span class="javadoctag"> @author</span> mrsimple</div><div class="line"> */</div><div class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">BitmapDecoder</span> </span>{</div><div class="line"></div><div class="line">    <span class="javadoc">/**</span></div><div class="line">     *<span class="javadoctag"> @param</span> options</div><div class="line">     *<span class="javadoctag"> @return</span></div><div class="line">     */</div><div class="line">    <span class="keyword">public</span> <span class="keyword">abstract</span> Bitmap <span class="title">decodeBitmapWithOption</span>(Options options);</div><div class="line"></div><div class="line">    <span class="javadoc">/**</span></div><div class="line">     *<span class="javadoctag"> @param</span> width 图片的目标宽度</div><div class="line">     *<span class="javadoctag"> @param</span> height 图片的目标高度</div><div class="line">     *<span class="javadoctag"> @return</span></div><div class="line">     */</div><div class="line">    <span class="keyword">public</span> Bitmap <span class="title">decodeBitmap</span>(<span class="keyword">int</span> width, <span class="keyword">int</span> height) {</div><div class="line">        <span class="comment">// 如果请求原图,则直接加载原图</span></div><div class="line">        <span class="keyword">if</span> (width &lt;= <span class="number">0</span> || height &lt;= <span class="number">0</span>) {</div><div class="line">            <span class="keyword">return</span> decodeBitmapWithOption(<span class="keyword">null</span>);</div><div class="line">        }</div><div class="line"></div><div class="line">        <span class="comment">// 1、获取只加载Bitmap宽高等数据的Option, 即设置options.inJustDecodeBounds = true;</span></div><div class="line">        BitmapFactory.Options options = getJustDecodeBoundsOptions();</div><div class="line">        <span class="comment">// 2、通过options加载bitmap，此时返回的bitmap为空,数据将存储在options中</span></div><div class="line">        decodeBitmapWithOption(options);</div><div class="line">        <span class="comment">// 3、计算缩放比例, 并且将options.inJustDecodeBounds设置为false;</span></div><div class="line">        calculateInSmall(options, width, height);</div><div class="line">        <span class="comment">// 4、通过options设置的缩放比例加载图片</span></div><div class="line">        <span class="keyword">return</span> decodeBitmapWithOption(options);</div><div class="line">    }</div><div class="line"></div><div class="line">    <span class="javadoc">/**</span></div><div class="line">     * 获取BitmapFactory.Options,设置为只解析图片边界信息</div><div class="line">     */</div><div class="line">    <span class="keyword">private</span> Options <span class="title">getJustDecodeBoundsOptions</span>() {</div><div class="line">        <span class="comment">//</span></div><div class="line">        BitmapFactory.Options options = <span class="keyword">new</span> BitmapFactory.Options();</div><div class="line">        <span class="comment">// 设置为true,表示解析Bitmap对象，该对象不占内存</span></div><div class="line">        options.inJustDecodeBounds = <span class="keyword">true</span>;</div><div class="line">        <span class="keyword">return</span> options;</div><div class="line">    }</div><div class="line"></div><div class="line">    <span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">calculateInSmall</span>(Options options, <span class="keyword">int</span> width, <span class="keyword">int</span> height) {</div><div class="line">        <span class="comment">// 设置缩放比例</span></div><div class="line">        options.inSampleSize = computeInSmallSize(options, width, height);</div><div class="line">        <span class="comment">// 图片质量</span></div><div class="line">        options.inPreferredConfig = Config.RGB_565;</div><div class="line">        <span class="comment">// 设置为false,解析Bitmap对象加入到内存中</span></div><div class="line">        options.inJustDecodeBounds = <span class="keyword">false</span>;</div><div class="line">        options.inPurgeable = <span class="keyword">true</span>;</div><div class="line">        options.inInputShareable = <span class="keyword">true</span>;</div><div class="line">    }</div><div class="line"></div><div class="line">    <span class="keyword">private</span> <span class="keyword">int</span> <span class="title">computeInSmallSize</span>(BitmapFactory.Options options, <span class="keyword">int</span> reqWidth, <span class="keyword">int</span> reqHeight) {</div><div class="line">        <span class="comment">// Raw height and width of image</span></div><div class="line">        <span class="keyword">final</span> <span class="keyword">int</span> height = options.outHeight;</div><div class="line">        <span class="keyword">final</span> <span class="keyword">int</span> width = options.outWidth;</div><div class="line">        <span class="keyword">int</span> inSampleSize = <span class="number">1</span>;</div><div class="line"></div><div class="line">        <span class="keyword">if</span> (height &gt; reqHeight || width &gt; reqWidth) {</div><div class="line">            <span class="comment">// Calculate ratios of height and width to requested height and</span></div><div class="line">            <span class="comment">// width</span></div><div class="line">            <span class="keyword">final</span> <span class="keyword">int</span> heightRatio = Math.round((<span class="keyword">float</span>) height / (<span class="keyword">float</span>) reqHeight);</div><div class="line">            <span class="keyword">final</span> <span class="keyword">int</span> widthRatio = Math.round((<span class="keyword">float</span>) width / (<span class="keyword">float</span>) reqWidth);</div><div class="line"></div><div class="line">            inSampleSize = heightRatio &lt; widthRatio ? heightRatio : widthRatio;</div><div class="line">            <span class="keyword">final</span> <span class="keyword">float</span> totalPixels = width * height;</div><div class="line"></div><div class="line">            <span class="comment">// Anything more than 2x the requested pixels we'll sample down</span></div><div class="line">            <span class="comment">// further</span></div><div class="line">            <span class="keyword">final</span> <span class="keyword">float</span> totalReqPixelsCap = reqWidth * reqHeight * <span class="number">2</span>;</div><div class="line"></div><div class="line">            <span class="keyword">while</span> (totalPixels / (inSampleSize * inSampleSize) &gt; totalReqPixelsCap) {</div><div class="line">                inSampleSize++;</div><div class="line">            }</div><div class="line">        }</div><div class="line">        <span class="keyword">return</span> inSampleSize;</div><div class="line">    }</div><div class="line"></div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>在decodeBitmap中，我们首先创建BitmapFactory.Options对象,并且设置options.inJustDecodeBounds = true，然后第一次调用decodeBitmapWithOption(options)，使得只解析图片尺寸等信息;然后调用calculateInSmall方法，该方法会调用computeInSmallSize来根据ImageView的尺寸来检查是否需要缩小要加载的图片以及计算缩放比例，在calculateInSmall方法的最后将 options.inJustDecodeBounds = false，使得下次再次decodeBitmapWithOption(options)时会加载图片；那最后一步必然就是调用decodeBitmapWithOption(options)啦，这样图片就会按照按照options设置的缩小比例来加载图片了。       </p>
+<p>我们使用这个辅助类封装了这个麻烦、重复的过程，在一定程度上简化了代码，也使得代码的可复用性更高，也是模板方法模式的一个较好的示例。       </p>
+<h2 id="二级缓存">二级缓存</h2>
+<p>有了内存和sd卡缓存，其实这还不够。我们的需求很可能就是这个缓存会同时有内存和sd卡缓存，这样上述两种缓存的优点我们就会具备，这里我们把它称为二级缓存。看看代码吧，也很简单。      </p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div></pre></td><td class="code"><pre><div class="line"><span class="javadoc">/**</span></div><div class="line"> * 综合缓存,内存和sd卡双缓存</div><div class="line"> * </div><div class="line"> *<span class="javadoctag"> @author</span> mrsimple</div><div class="line"> */</div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">DoubleCache</span> <span class="keyword">implements</span> <span class="title">BitmapCache</span> </span>{</div><div class="line">    DiskCache mDiskCache;</div><div class="line">    MemoryCache mMemoryCache = <span class="keyword">new</span> MemoryCache();</div><div class="line"></div><div class="line">    <span class="keyword">public</span> <span class="title">DoubleCache</span>(Context context) {</div><div class="line">        mDiskCache = DiskCache.getDiskCache(context);</div><div class="line">    }</div><div class="line"></div><div class="line">    <span class="annotation">@Override</span></div><div class="line">    <span class="keyword">public</span> Bitmap <span class="title">get</span>(BitmapRequest key) {</div><div class="line">        Bitmap value = mMemoryCache.get(key);</div><div class="line">        <span class="keyword">if</span> (value == <span class="keyword">null</span>) {</div><div class="line">            value = mDiskCache.get(key);</div><div class="line">            saveBitmapIntoMemory(key, value);</div><div class="line">        }</div><div class="line">        <span class="keyword">return</span> value;</div><div class="line">    }</div><div class="line"></div><div class="line">    <span class="keyword">private</span> <span class="keyword">void</span> <span class="title">saveBitmapIntoMemory</span>(BitmapRequest key, Bitmap bitmap) {</div><div class="line">        <span class="comment">// 如果Value从disk中读取,那么存入内存缓存</span></div><div class="line">        <span class="keyword">if</span> (bitmap != <span class="keyword">null</span>) {</div><div class="line">            mMemoryCache.put(key, bitmap);</div><div class="line">        }</div><div class="line">    }</div><div class="line"></div><div class="line">    <span class="annotation">@Override</span></div><div class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title">put</span>(BitmapRequest key, Bitmap value) {</div><div class="line">        mDiskCache.put(key, value);</div><div class="line">        mMemoryCache.put(key, value);</div><div class="line">    }</div><div class="line"></div><div class="line">    <span class="annotation">@Override</span></div><div class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title">remove</span>(BitmapRequest key) {</div><div class="line">        mDiskCache.remove(key);</div><div class="line">        mMemoryCache.remove(key);</div><div class="line">    }</div><div class="line"></div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>其实就是封装了内存缓存和sd卡缓存的相关操作嘛~ 那我就不要再费口舌了</p>
+<h2 id="自定义缓存">自定义缓存</h2>
+<p>缓存是有很多实现策略的，既然我们要可扩展性，那就要允许用户注入自己的缓存实现。只要你实现BitmapCache，就可以将它通过ImageLoaderConfig注入到ImageLoader内部。</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">initImageLoader</span>() {</div><div class="line">    ImageLoaderConfig config = <span class="keyword">new</span> ImageLoaderConfig()</div><div class="line">            .setLoadingPlaceholder(R.drawable.loading)</div><div class="line">            .setNotFoundPlaceholder(R.drawable.not_found)</div><div class="line">            .setCache(<span class="keyword">new</span> MyCache())</div><div class="line">    <span class="comment">// 初始化</span></div><div class="line">    SimpleImageLoader.getInstance().init(config);</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p><strong>MyCache.java</strong>     </p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 自定义缓存实现类</span></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyCache</span> <span class="keyword">implements</span> <span class="title">BitmapCache</span> </span>{</div><div class="line"></div><div class="line">  	<span class="comment">// 代码</span></div><div class="line"></div><div class="line">    <span class="annotation">@Override</span></div><div class="line">    <span class="keyword">public</span> Bitmap <span class="title">get</span>(BitmapRequest key) {</div><div class="line">        <span class="comment">// 你的代码</span></div><div class="line">    }</div><div class="line"></div><div class="line">    <span class="annotation">@Override</span></div><div class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title">put</span>(BitmapRequest key, Bitmap value) {</div><div class="line">    	<span class="comment">// 你的代码  </span></div><div class="line">    }</div><div class="line"></div><div class="line">    <span class="annotation">@Override</span></div><div class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title">remove</span>(BitmapRequest key) {</div><div class="line">        <span class="comment">// 你的代码</span></div><div class="line">    }</div><div class="line"></div><div class="line">}</div></pre></td></tr></table></figure>
+
+<h2 id="总结">总结</h2>
+<p>ImageLoader系列到这里就算结束了，我们从基本架构、具体实现、设计上面详细的阐述了一个简单、可扩展性较好的ImageLoader实现过程，希望大家看完这个系列之后能够自己去实现一遍，这样你会发现一些具体的问题，领悟能够更加的深刻。如果你在看这系列博客的过程中，真的能够从中体会到面向对象的基本原则、设计思考等东西，而不是说”我擦，我又找到了一个可以copy来用的ImageLoader”,那我就觉得我做的这些分享到达目的了。</p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Android/">Android</a><a href="/tags/ImageLoader/">ImageLoader</a><a href="/tags/开源库/">开源库</a>
+  </div>
+
+
+
+
+<div class="article-share" id="share">
+
+  
+<div class="jiathis_style">
+    <span class="jiathis_txt">分享到：</span>
+    <a class="jiathis_button_tsina">新浪微博</a>
+    <a class="jiathis_button_weixin">微信</a>
+    <a class="jiathis_button_twitter">Twitter</a>
+    <a class="jiathis_button_evernote">EverNote</a>
+    <a href="http://www.jiathis.com/share?uid=1501277" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank">更多</a>
+</div>
+<script type="text/javascript" >
+    var jiathis_config={
+    data_track_clickback:true,
+    sm:"copy,renren,cqq",
+    pic:"",
+    summary:"",
+    
+  </script> 
+<script type="text/javascript" src="//v3.jiathis.com/code/jia.js?uid=
+" charset="utf-8"></script>      
+
+
+</div>
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+
+<div class="next">
+<a href="/2015/03/03/Android设计模式源码解析之观察者模式/"  title="Android设计模式源码解析之观察者模式">
+ <strong>NEXT:</strong><br/> 
+ <span>Android设计模式源码解析之观察者模式
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+<section class="comment">
+	<div class="ds-thread"></div>
+</section>
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">Contents</strong>
+  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#缓存接口"><span class="toc-number">1.</span> <span class="toc-text">缓存接口</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#内存缓存"><span class="toc-number">2.</span> <span class="toc-text">内存缓存</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#sd卡缓存"><span class="toc-number">3.</span> <span class="toc-text">sd卡缓存</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#BitmapDecoder"><span class="toc-number">4.</span> <span class="toc-text">BitmapDecoder</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#二级缓存"><span class="toc-number">5.</span> <span class="toc-text">二级缓存</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#自定义缓存"><span class="toc-number">6.</span> <span class="toc-text">自定义缓存</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#总结"><span class="toc-number">7.</span> <span class="toc-text">总结</span></a></li></ol>
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<aside class="clearfix">
+
+  
+
+  
+<div class="tagslist">
+	<p class="asidetitle">Tags</p>
+		<ul class="clearfix">
+		
+			<li><a href="/tags/Android/" title="Android">Android<sup>1</sup></a></li>
+		
+			<li><a href="/tags/ImageLoader/" title="ImageLoader">ImageLoader<sup>1</sup></a></li>
+		
+			<li><a href="/tags/android/" title="android">android<sup>1</sup></a></li>
+		
+			<li><a href="/tags/开源库/" title="开源库">开源库<sup>1</sup></a></li>
+		
+			<li><a href="/tags/开源库，设计模式，Android/" title="开源库，设计模式，Android">开源库，设计模式，Android<sup>1</sup></a></li>
+		
+			<li><a href="/tags/设计模式，Android/" title="设计模式，Android">设计模式，Android<sup>1</sup></a></li>
+		
+			<li><a href="/tags/设计模式，Android，源码/" title="设计模式，Android，源码">设计模式，Android，源码<sup>1</sup></a></li>
+		
+			<li><a href="/tags/面向对象/" title="面向对象">面向对象<sup>1</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  <div class="rsspart">
+	<a href="null" target="_blank" title="rss">RSS</a>
+</div>
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<div class="social-font clearfix">
+		
+		
+		
+		
+		
+	</div>
+		<p class="copyright">Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/A-limon/pacman" target="_blank" title="Pacman">Pacman</a> © 2015 
+		
+		<a href="http://www.simplecoder.cn" target="_blank" title="Mr.Simple">Mr.Simple</a>
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.1.0.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+
+<script type="text/javascript">
+  var duoshuoQuery = {short_name:"null"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script> 
+
+
+
+
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+ga('create', 'null', 'null');  
+ga('send', 'pageview');
+</script>
+
+
+  </body>
+</html>
